@@ -1,15 +1,28 @@
+"use client";
+
 import { Moon, Sun } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 const ThemeToggle = () => {
-  const [isDark, setIsDark] = useState(() => {
-    if (typeof window !== "undefined") {
-      const savedTheme = localStorage.getItem("theme");
-      const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-      return savedTheme === "dark" || (!savedTheme && prefersDark);
+  const [isDark, setIsDark] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    const savedTheme = localStorage.getItem("theme");
+    const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+    const initialDark = savedTheme === "dark" || (!savedTheme && prefersDark);
+
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setIsDark(initialDark);
+
+    if (initialDark) {
+      document.documentElement.classList.add("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
     }
-    return false; // default for SSR
-  });
+
+    setMounted(true);
+  }, []);
 
   const toggleTheme = () => {
     const newIsDark = !isDark;
@@ -23,6 +36,8 @@ const ThemeToggle = () => {
       localStorage.setItem("theme", "light");
     }
   };
+
+  if (!mounted) return null;
 
   return (
     <button
@@ -40,4 +55,3 @@ const ThemeToggle = () => {
 };
 
 export default ThemeToggle;
-

@@ -13,7 +13,7 @@ const OutputCard = ({ output, isTyping, onClear }: OutputCardProps) => {
 
   const handleCopy = async () => {
     if (!output) return;
-    
+
     await navigator.clipboard.writeText(output);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
@@ -22,8 +22,8 @@ const OutputCard = ({ output, isTyping, onClear }: OutputCardProps) => {
   if (!output && !isTyping) return null;
 
   return (
-    <div 
-      className="w-full animate-fade-in-up" 
+    <div
+      className="w-full animate-fade-in-up"
       style={{ animationDelay: '0.3s' }}
     >
       <div className="glass-card p-4 md:p-6 border-2 border-primary/20">
@@ -34,7 +34,7 @@ const OutputCard = ({ output, isTyping, onClear }: OutputCardProps) => {
             </div>
             <span className="font-semibold text-foreground">Banglish Output</span>
           </div>
-          
+
           <div className="flex items-center gap-2">
             <Button
               variant="ghost"
@@ -42,6 +42,7 @@ const OutputCard = ({ output, isTyping, onClear }: OutputCardProps) => {
               onClick={handleCopy}
               disabled={!output || isTyping}
               className="text-muted-foreground hover:text-foreground transition-colors rounded-xl"
+              aria-label="Copy converted text"
             >
               {copied ? (
                 <>
@@ -55,25 +56,26 @@ const OutputCard = ({ output, isTyping, onClear }: OutputCardProps) => {
                 </>
               )}
             </Button>
-            
+
             <Button
               variant="ghost"
               size="sm"
               onClick={onClear}
               className="text-muted-foreground hover:text-foreground transition-colors rounded-xl"
+              aria-label="Clear output"
             >
               <RefreshCw className="w-4 h-4 mr-1.5" />
               Clear
             </Button>
           </div>
         </div>
-        
+
         <div className="min-h-[120px] md:min-h-[150px] text-foreground text-base md:text-lg leading-relaxed">
           <p className={isTyping ? 'typing-cursor' : ''}>
             {output}
           </p>
         </div>
-        
+
         {/* Success indicator */}
         {output && !isTyping && (
           <div className="flex items-center justify-center gap-2 mt-4 pt-4 border-t border-border/50">
@@ -82,6 +84,11 @@ const OutputCard = ({ output, isTyping, onClear }: OutputCardProps) => {
           </div>
         )}
       </div>
+
+      <div aria-live="polite" className="sr-only">
+        {copied && "Converted text copied to clipboard"}
+      </div>
+
     </div>
   );
 };

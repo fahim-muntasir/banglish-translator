@@ -1,36 +1,102 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Fahim-er Banglish Translator ✨
 
-## Getting Started
+A modern, fast, and social-media-friendly **Banglish (Romanized Bangla) translator** that transforms **any language** into natural Banglish — optimized for chats, posts, and everyday communication.
 
-First, run the development server:
+Built with **Next.js**, **TypeScript**, **Tailwind CSS**, and **Google Gemini AI**.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+---
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 🚀 Live Demo
+[https://banglish-translator.vercel.app](https://banglish-translator.vercel.app)
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+---
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## ✨ Features
 
-## Learn More
+- 🌍 **Multi-language input**
+  - Supports Bangla, English, Chinese, Japanese, Arabic, Hindi, Russian, German, and more
+- 📝 **Strict Bangla → Banglish transliteration**
+  - Word-by-word conversion (no paraphrasing)
+- 💬 **Natural conversational Banglish**
+  - Optimized for chats & social media
+- 🔧 **Smart Banglish handling**
+  - Fixes spelling if the input is already Banglish
+- ⚡ **Fast AI-powered conversion**
+  - Powered by Google Gemini (`gemini-2.5-flash`)
+- 🎯 **Daily usage limit**
+  - Simple client-side limit (testing-friendly)
+- 🌗 **Light / Dark mode**
+  - System-aware theme toggle
+- ⌨️ **Keyboard support**
+  - `Ctrl + Enter` / `Cmd + Enter` to convert
+- ♿ **Accessible by design**
+  - Screen-reader & keyboard friendly
+- 🎨 **Polished UI**
+  - Smooth animations & typing effect
 
-To learn more about Next.js, take a look at the following resources:
+---
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 🧠 Conversion Rules
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+The AI prompt enforces the following rules:
 
-## Deploy on Vercel
+- Convert **ALL languages** into Banglish
+- **Bangla text**
+  - Strict transliteration (no rewriting)
+- **Already Banglish**
+  - Fix spelling mistakes only
+  - Do NOT change sentence structure
+- **English & other languages**
+  - Convert to natural spoken Banglish
+- Preserve:
+  - Punctuation
+  - Casual English words (`hi`, `hello`, `ok`, `wow`)
+- Output:
+  - Banglish only
+  - No explanations
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+---
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## ♿ Accessibility Highlights
+
+- Screen-reader-only labels
+- Keyboard navigation (Tab order)
+- Focus-visible states
+- ARIA attributes for buttons and text areas
+- Semantic HTML structure
+- Form submission via Ctrl+Enter / Cmd+Enter
+
+---
+
+## 🧩 Future Improvements
+
+- Server-side rate limiting
+- User accounts and login
+- Conversion history
+- Language detection badge
+- Offline fallback rules
+- PWA support
+
+---
+
+## 🚧 Current Limitations
+
+- Client-side usage limit (4 conversions/day)
+- No authentication
+- Free-tier Gemini API constraints
+- Max input length limited to 200 characters for free testing
+
+---
+
+## 🛠 Tech Stack
+
+### Frontend
+- Next.js
+- TypeScript
+- Tailwind CSS
+- Lucide Icons
+- Sonner (toast notifications)
+
+### Backend
+- Next.js API Routes
+- Google Gemini AI (`@google/genai`)
