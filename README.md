@@ -100,3 +100,17 @@ The AI prompt enforces the following rules:
 ### Backend
 - Next.js API Routes
 - Google Gemini AI (`@google/genai`)
+
+## 🧪 Testing
+
+This project uses **Jest** and **React Testing Library** for testing React components and frontend logic.
+
+### How to Run Tests
+
+```bash
+# Run all tests once
+npm test
+
+# Run tests in watch mode (recommended during development)
+npm run test:watch
+
