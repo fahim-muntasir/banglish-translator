@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useRef, useEffect } from "react";
 import TextInput from "@/components/TextInput";
 import OutputCard from "@/components/OutputCard";
 import { canUserConvert, increaseUsage } from "@/lib/usageLimit";
@@ -11,16 +11,24 @@ export default function ConverterPanel() {
   const [outputText, setOutputText] = useState("");
   const [isConverting, setIsConverting] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
+  
+  const typingTimerRef = useRef<NodeJS.Timeout | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (typingTimerRef.current) clearInterval(typingTimerRef.current);
+    };
+  }, []);
 
   const handleConvert = useCallback(async () => {
-    if (!inputText.trim()) return;
+    if (!inputText.trim() || isConverting || isTyping) return;
 
     if (!canUserConvert()) {
       showLimitError();
       return;
     }
 
-    increaseUsage();
+    if (typingTimerRef.current) clearInterval(typingTimerRef.current);
 
     setIsConverting(true);
     setOutputText("");
@@ -34,27 +42,28 @@ export default function ConverterPanel() {
 
       if (!res.ok) {
         showError("Server error. Please try again.");
+        setIsConverting(false);
         return;
       }
 
       const data = await res.json();
-
       const converted = data.convertedText || "[Banglish conversion failed]";
 
-      // Typing animation
+      increaseUsage(); // Increase usage only after successful fetch
       setIsConverting(false);
       setIsTyping(true);
 
       let currentIndex = 0;
-      const typingInterval = setInterval(() => {
+
+      typingTimerRef.current = setInterval(() => {
         if (currentIndex <= converted.length) {
           setOutputText(converted.slice(0, currentIndex));
           currentIndex++;
         } else {
-          clearInterval(typingInterval);
+          if (typingTimerRef.current) clearInterval(typingTimerRef.current);
           setIsTyping(false);
         }
-      }, 20);
+      }, 15);
 
     } catch (err) {
       console.error(err);
@@ -63,11 +72,13 @@ export default function ConverterPanel() {
       setIsConverting(false);
       setIsTyping(false);
     }
-  }, [inputText]);
+  }, [inputText, isConverting, isTyping]);
 
   const handleClear = useCallback(() => {
+    if (typingTimerRef.current) clearInterval(typingTimerRef.current);
     setInputText("");
     setOutputText("");
+    setIsTyping(false);
   }, []);
 
   return (
@@ -75,7 +86,7 @@ export default function ConverterPanel() {
       <TextInput
         onSubmit={handleConvert}
         isLoading={isConverting}
-        disabled={!inputText.trim()}
+        disabled={!inputText.trim() || isTyping}
         value={inputText}
         onChange={setInputText}
       />

@@ -33,10 +33,11 @@ const TextInput = ({
         onSubmit();
       }}
     >
-      <div className="w-full animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
+      <div className="w-full animate-fade-in-up [animation-delay:100ms]">
         <div className="bg-card/95 backdrop-blur-md border-2 border-border/60 rounded-2xl p-4 md:p-6 shadow-lg hover:shadow-xl hover:border-primary/30 transition-all duration-300 focus-within:border-primary/50 focus-within:shadow-xl focus-within:ring-2 focus-within:ring-primary/20">
+          
           <div className="flex items-center justify-between mb-3">
-            <div className="text-sm text-muted-foreground flex items-center gap-2 font-medium">
+            <div id="char-count" className="text-sm text-muted-foreground flex items-center gap-2 font-medium">
               <span className={value.length > maxLength * 0.9 ? 'text-accent font-semibold' : ''}>
                 {value.length.toLocaleString()}
               </span>
@@ -64,11 +65,10 @@ const TextInput = ({
             className="w-full min-h-[180px] md:min-h-[220px] bg-transparent resize-none focus:outline-none text-foreground placeholder:text-muted-foreground/50 text-base md:text-lg leading-relaxed"
           />
 
-          {/* Progress bar */}
           <div className="h-1.5 w-full bg-muted/80 rounded-full overflow-hidden mt-3">
             <div
-              className="h-full bg-gradient-to-r from-primary to-accent transition-all duration-300 rounded-full"
-              style={{ width: `${Math.min(characterPercentage, 100)}%` }}
+              className="h-full bg-gradient-to-r from-primary to-accent transition-transform duration-300 origin-left rounded-full"
+              style={{ transform: `scaleX(${Math.min(characterPercentage / 100, 1)})` }}
             />
           </div>
         </div>

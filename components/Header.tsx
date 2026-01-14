@@ -14,14 +14,10 @@ const Header = () => {
       </div>
 
       <h1 className="text-3xl md:text-5xl lg:text-6xl font-extrabold mb-3 tracking-tight text-center">
-        {/* "Fahim-er " remains normal gradient or text */}
         <span className="gradient-text">Fahim</span>
         <span className="text-foreground">-er </span>
-
-        {/* "Banglish" filled with image */}
         <span
-          className="text-transparent bg-clip-text bg-cover bg-center"
-          style={{ backgroundImage: "url('/images/banglish-bg.jpg')" }}
+          className="inline-block h-10 md:h-14 lg:h-16 text-transparent bg-clip-text bg-cover bg-center bg-white dark:bg-slate-950 [background-image:url('/images/banglish-bg.webp')]"
         >
           Banglish
         </span>
@@ -30,7 +26,6 @@ const Header = () => {
 
         <span className="text-foreground">Translator</span>
       </h1>
-
 
       <p className="text-muted-foreground text-base md:text-lg max-w-md mx-auto">
         Convert any language into Banglish instantly ✨
