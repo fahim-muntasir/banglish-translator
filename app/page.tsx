@@ -3,6 +3,7 @@ import Footer from "@/components/Footer";
 import FloatingShapes from "@/components/FloatingShapes";
 import ThemeToggle from "@/components/ThemeToggle";
 import FlagButton from "@/components/FlagButton";
+import SigninButton from "@/components/SigninButton";
 import ConverterPanel from "@/components/ConverterPanel";
 
 export default function Home() {
@@ -11,6 +12,7 @@ export default function Home() {
     <div className="min-h-screen relative overflow-hidden">
       <FlagButton />
       <ThemeToggle />
+      <SigninButton />
       <FloatingShapes />
 
       <main className="relative z-10 container max-w-2xl mx-auto px-4 py-20 md:py-24">

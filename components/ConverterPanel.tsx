@@ -5,13 +5,20 @@ import TextInput from "@/components/TextInput";
 import OutputCard from "@/components/OutputCard";
 import { canUserConvert, increaseUsage } from "@/lib/usageLimit";
 import { showLimitError, showError } from "@/lib/alert";
+import SigninModal from "./SigninModal";
+import { useAuth } from "@/context/AuthContext";
+import { signInWithGoogle } from "@/lib/auth";
 
 export default function ConverterPanel() {
   const [inputText, setInputText] = useState("");
   const [outputText, setOutputText] = useState("");
   const [isConverting, setIsConverting] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
-  
+  const [isSigninModalOpen, setIsSigninModalOpen] = useState(false);
+  const [pendingConversion, setPendingConversion] = useState(false);
+
+  const { user } = useAuth();
+
   const typingTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
@@ -20,7 +27,29 @@ export default function ConverterPanel() {
     };
   }, []);
 
+  useEffect(() => {
+    if (user && isSigninModalOpen) {
+      setIsSigninModalOpen(false);
+    }
+  }, [user, isSigninModalOpen]);
+
+
+  const handleGoogleLogin = async () => {
+    try {
+      await signInWithGoogle();
+    } catch (error) {
+      console.error("Login failed:", error);
+      alert("Login failed. Please try again.");
+    }
+  };
+
   const handleConvert = useCallback(async () => {
+    if (!user) {
+      setPendingConversion(true);
+      setIsSigninModalOpen(true);
+      return;
+    }
+
     if (!inputText.trim() || isConverting || isTyping) return;
 
     if (!canUserConvert()) {
@@ -40,39 +69,39 @@ export default function ConverterPanel() {
         body: JSON.stringify({ text: inputText }),
       });
 
-      if (!res.ok) {
-        showError("Server error. Please try again.");
-        setIsConverting(false);
-        return;
-      }
-
       const data = await res.json();
-      const converted = data.convertedText || "[Banglish conversion failed]";
+      const converted = data.convertedText || "Conversion failed";
 
-      increaseUsage(); // Increase usage only after successful fetch
-      setIsConverting(false);
+      increaseUsage();
       setIsTyping(true);
+      setIsConverting(false);
 
-      let currentIndex = 0;
-
+      let i = 0;
       typingTimerRef.current = setInterval(() => {
-        if (currentIndex <= converted.length) {
-          setOutputText(converted.slice(0, currentIndex));
-          currentIndex++;
+        if (i <= converted.length) {
+          setOutputText(converted.slice(0, i));
+          i++;
         } else {
-          if (typingTimerRef.current) clearInterval(typingTimerRef.current);
+          clearInterval(typingTimerRef.current!);
           setIsTyping(false);
         }
       }, 15);
-
-    } catch (err) {
-      console.error(err);
-      showError("❌ An error occurred while converting the text.");
-      setOutputText("[Banglish conversion failed]");
+    } catch {
       setIsConverting(false);
-      setIsTyping(false);
+      showError("Something went wrong");
     }
-  }, [inputText, isConverting, isTyping]);
+  }, [user, inputText, isConverting, isTyping]);
+
+  useEffect(() => {
+    if (!user || !pendingConversion) return;
+
+    setPendingConversion(false);
+
+    setTimeout(() => {
+      handleConvert();
+    }, 0);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user, pendingConversion]);
 
   const handleClear = useCallback(() => {
     if (typingTimerRef.current) clearInterval(typingTimerRef.current);
@@ -96,6 +125,8 @@ export default function ConverterPanel() {
         isTyping={isTyping}
         onClear={handleClear}
       />
+
+      <SigninModal open={isSigninModalOpen} onOpenChange={setIsSigninModalOpen} handleGoogleLogin={handleGoogleLogin} />
     </>
   );
 }
