@@ -1,0 +1,1 @@
+export type UserPlan = "FREE" | "STARTER" | "PRO" | "BUSINESS";

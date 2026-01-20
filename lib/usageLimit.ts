@@ -1,39 +1,44 @@
-const MAX_DAILY_LIMIT = 4;
+import { doc, getDoc, updateDoc, increment } from "firebase/firestore";
+import { db } from "@/lib/firebase";
+import { PLAN_LIMITS } from "./plans";
+import { UserPlan } from "@/types/user";
 
-export function canUserConvert(): boolean {
-  if (typeof window === "undefined") return false;
+export async function canUserConvert(uid: string) {
+  const ref = doc(db, "users", uid);
+  const snap = await getDoc(ref);
 
-  const today = new Date().toDateString();
+  if (!snap.exists()) return false;
 
-  const savedDate = localStorage.getItem("banglish_date");
-  const savedCount = Number(localStorage.getItem("banglish_count") || 0);
+  const data = snap.data();
 
-  if (savedDate !== today) {
-    localStorage.setItem("banglish_date", today);
-    localStorage.setItem("banglish_count", "0");
+  const plan: UserPlan =
+    data.plan && PLAN_LIMITS[data.plan as UserPlan] ? data.plan : "FREE";
+
+  const limit = PLAN_LIMITS[plan];
+
+  const now = new Date();
+  const resetAt = data.usage?.resetAt?.toDate();
+
+  // Reset monthly usage
+  if (!resetAt || now > resetAt) {
+    await updateDoc(ref, {
+      "usage.count": 0,
+      "usage.resetAt": new Date(
+        new Date().getFullYear(),
+        new Date().getMonth() + 1,
+        1,
+      ),
+    });
     return true;
   }
 
-  return savedCount < MAX_DAILY_LIMIT;
+  return data.usage.count < limit;
 }
 
-export function increaseUsage(): void {
-  if (typeof window === "undefined") return;
+export async function increaseUsage(uid: string) {
+  const ref = doc(db, "users", uid);
 
-  const count = Number(localStorage.getItem("banglish_count") || 0);
-  localStorage.setItem("banglish_count", String(count + 1));
+  await updateDoc(ref, {
+    "usage.count": increment(1),
+  });
 }
-
-export function getRemainingUsage(): number {
-  if (typeof window === "undefined") return MAX_DAILY_LIMIT;
-
-  const today = new Date().toDateString();
-  const savedDate = localStorage.getItem("banglish_date");
-
-  if (savedDate !== today) return MAX_DAILY_LIMIT;
-
-  const used = Number(localStorage.getItem("banglish_count") || 0);
-  return Math.max(0, MAX_DAILY_LIMIT - used);
-}
-
-export { MAX_DAILY_LIMIT };

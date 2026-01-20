@@ -13,5 +13,5 @@ export const showInfo = (message: string) => {
 };
 
 export const showLimitError = () => {
-  toast.error("🚫 Daily free limit reached. Try again tomorrow.");
+  toast.error("🚫 Your limit reached. Try again tomorrow.");
 };

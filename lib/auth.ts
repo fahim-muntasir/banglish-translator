@@ -10,26 +10,13 @@ export const signInWithGoogle = async () => {
     doc(db, "users", user.uid),
     {
       uid: user.uid,
-      name: user.displayName,
-      email: user.email,
-      photo: user.photoURL,
-      provider: "google",
-
-      plan: "free",
-      planStartedAt: null,
-      planExpiresAt: null,
-
-      dailyUsage: 0,
-      dailyLimit: 20,
-      lastUsageReset: serverTimestamp(),
-
-      totalTranslations: 0,
-      isBlocked: false,
-
-      createdAt: serverTimestamp(),
-      lastLogin: serverTimestamp(),
+      plan: "FREE",
+      usage: {
+        count: 0,
+        resetAt: serverTimestamp(),
+      },
     },
-    { merge: true }
+    { merge: true },
   );
 
   return user;
@@ -38,4 +25,3 @@ export const signInWithGoogle = async () => {
 export const logout = async () => {
   await signOut(auth);
 };
-

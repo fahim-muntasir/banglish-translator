@@ -8,6 +8,7 @@ import { showLimitError, showError } from "@/lib/alert";
 import SigninModal from "./SigninModal";
 import { useAuth } from "@/context/AuthContext";
 import { signInWithGoogle } from "@/lib/auth";
+// import CreditsBar from "./CreditsBar";
 
 export default function ConverterPanel() {
   const [inputText, setInputText] = useState("");
@@ -52,7 +53,9 @@ export default function ConverterPanel() {
 
     if (!inputText.trim() || isConverting || isTyping) return;
 
-    if (!canUserConvert()) {
+    const canConvert = await canUserConvert(user.uid);
+
+    if (!canConvert) {
       showLimitError();
       return;
     }
@@ -72,7 +75,9 @@ export default function ConverterPanel() {
       const data = await res.json();
       const converted = data.convertedText || "Conversion failed";
 
-      increaseUsage();
+      // Increase usage count
+      await increaseUsage(user.uid);
+
       setIsTyping(true);
       setIsConverting(false);
 
@@ -112,6 +117,8 @@ export default function ConverterPanel() {
 
   return (
     <>
+      {/* <CreditsBar creditsLeft={100} onUpgrade={() => {}} /> */}
+
       <TextInput
         onSubmit={handleConvert}
         isLoading={isConverting}
