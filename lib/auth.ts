@@ -11,6 +11,13 @@ export const signInWithGoogle = async () => {
     {
       uid: user.uid,
       plan: "FREE",
+      
+      dailyUsage: 0,
+      lastUsageReset: serverTimestamp(),
+
+      totalTranslations: 0,
+      isBlocked: false,
+      
       usage: {
         count: 0,
         resetAt: serverTimestamp(),

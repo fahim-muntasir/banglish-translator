@@ -1,7 +1,9 @@
 import { ChangeEvent } from "react";
 import ConvertButton from "./ConvertButton";
+import CreditsBar from "./CreditsBar";
+import { useAuth } from "@/context/AuthContext";
 
-interface TextInputProps {
+type TextInputProps = {
   value: string;
   onChange: (value: string) => void;
   onSubmit: () => void;
@@ -18,6 +20,8 @@ const TextInput = ({
   disabled,
   maxLength = 500
 }: TextInputProps) => {
+  const { user } = useAuth();
+
   const handleChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
     if (e.target.value.length <= maxLength) {
       onChange(e.target.value);
@@ -33,7 +37,10 @@ const TextInput = ({
         onSubmit();
       }}
     >
-      <div className="w-full animate-fade-in-up [animation-delay:100ms]">
+      <div className={"w-full animate-fade-in-up [animation-delay:100ms] relative" + (user ? " mt-16 md:mt-24" : "")}>
+
+        {user && <CreditsBar />}
+
         <div className="bg-card/95 backdrop-blur-md border-2 border-border/60 rounded-2xl p-4 md:p-6 shadow-lg hover:shadow-xl hover:border-primary/30 transition-all duration-300 focus-within:border-primary/50 focus-within:shadow-xl focus-within:ring-2 focus-within:ring-primary/20">
           
           <div className="flex items-center justify-between mb-3">

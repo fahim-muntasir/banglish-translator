@@ -12,6 +12,6 @@ export const showInfo = (message: string) => {
   toast(message);
 };
 
-export const showLimitError = () => {
-  toast.error("🚫 Your limit reached. Try again tomorrow.");
+export const showLimitError = (message: string) => {
+  toast.error(message);
 };

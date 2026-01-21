@@ -6,11 +6,11 @@ import {
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
+import { useUserPlan } from "@/context/UserPlanContext";
 
-interface PricingModalProps {
+type PricingModalProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  currentPlan?: string;
 }
 
 const plans = [
@@ -83,19 +83,13 @@ const plans = [
   },
 ];
 
-export const PricingModal = ({ open, onOpenChange, currentPlan = "Free" }: PricingModalProps) => {
+export const PricingModal = ({ open, onOpenChange }: PricingModalProps) => {
+  const { plan: currentPlan } = useUserPlan();
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-5xl p-0 overflow-hidden border-0 bg-background/90 backdrop-blur-xl shadow-2xl max-h-[90vh] overflow-y-auto">
         <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5 pointer-events-none" />
-        
-        {/* <button
-          onClick={() => onOpenChange(false)}
-          className="absolute right-4 top-4 z-10 rounded-full p-1.5 text-muted-foreground/60 transition-colors hover:bg-muted hover:text-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
-          aria-label="Close"
-        >
-          <X className="h-4 w-4" />
-        </button> */}
 
         <div className="relative px-6 py-8 sm:px-10 sm:py-12">
           <div className="text-center mb-10">

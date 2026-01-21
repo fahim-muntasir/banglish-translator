@@ -7,7 +7,9 @@ import { canUserConvert, increaseUsage } from "@/lib/usageLimit";
 import { showLimitError, showError } from "@/lib/alert";
 import SigninModal from "./SigninModal";
 import { useAuth } from "@/context/AuthContext";
+import { useUpgradePlan } from "@/context/UpgradeContext";
 import { signInWithGoogle } from "@/lib/auth";
+import PricingModal from "./PricingModal";
 // import CreditsBar from "./CreditsBar";
 
 export default function ConverterPanel() {
@@ -19,6 +21,7 @@ export default function ConverterPanel() {
   const [pendingConversion, setPendingConversion] = useState(false);
 
   const { user } = useAuth();
+  const { isPricingModalOpen, setIsPricingModalOpen } = useUpgradePlan();
 
   const typingTimerRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -45,6 +48,8 @@ export default function ConverterPanel() {
   };
 
   const handleConvert = useCallback(async () => {
+    setIsConverting(true);
+
     if (!user) {
       setPendingConversion(true);
       setIsSigninModalOpen(true);
@@ -53,16 +58,24 @@ export default function ConverterPanel() {
 
     if (!inputText.trim() || isConverting || isTyping) return;
 
-    const canConvert = await canUserConvert(user.uid);
+    const result = await canUserConvert(user.uid);
 
-    if (!canConvert) {
-      showLimitError();
+    if (!result.allowed) {
+      if (result.reason === "DAILY_LIMIT") {
+        showLimitError("Daily limit reached. Try again tomorrow!");
+      }
+
+      if (result.reason === "MONTHLY_LIMIT") {
+        showLimitError("Monthly limit reached. Upgrade your plan!");
+      }
+
+      setIsConverting(false);
       return;
     }
 
+
     if (typingTimerRef.current) clearInterval(typingTimerRef.current);
 
-    setIsConverting(true);
     setOutputText("");
 
     try {
@@ -134,6 +147,8 @@ export default function ConverterPanel() {
       />
 
       <SigninModal open={isSigninModalOpen} onOpenChange={setIsSigninModalOpen} handleGoogleLogin={handleGoogleLogin} />
+
+      <PricingModal open={isPricingModalOpen} onOpenChange={setIsPricingModalOpen} />
     </>
   );
 }

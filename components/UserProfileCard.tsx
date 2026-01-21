@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import { LogOut, Crown, Sparkles } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -12,9 +11,9 @@ import {
 } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
 import { logout } from "@/lib/auth";
-import PricingModal from "./PricingModal";
-
-type UserPlan = "FREE" | "STARTER" | "PRO" | "BUSINESS";
+import { useUpgradePlan } from "@/context/UpgradeContext";
+import { useUserPlan } from "@/context/UserPlanContext";
+import { UserPlan } from "@/types/user";
 
 const planConfig: Record<
   UserPlan,
@@ -48,11 +47,11 @@ const planConfig: Record<
 
 export const UserProfileCard = () => {
   const { user } = useAuth();
-  const [isPricingModalOpen, setIsPricingModalOpen] = useState(false);
+  const { onUpgrade } = useUpgradePlan();
+  const { plan: userPlan } = useUserPlan();
 
   if (!user) return null;
 
-  const userPlan: UserPlan = "FREE";
   const plan = planConfig[userPlan];
   const PlanIcon = plan.icon;
 
@@ -62,10 +61,6 @@ export const UserProfileCard = () => {
       .map((n: string) => n[0])
       .join("")
       .slice(0, 2) || "U";
-
-  const onUpgrade = () => {
-    setIsPricingModalOpen(true);
-  };
 
   const onLogout = async () => {
     try {
@@ -172,8 +167,6 @@ export const UserProfileCard = () => {
           </div>
         </PopoverContent>
       </Popover>
-
-      <PricingModal open={isPricingModalOpen} onOpenChange={setIsPricingModalOpen} currentPlan={plan.label} />
     </>
   );
 };
