@@ -24,7 +24,7 @@ Built with **Next.js**, **TypeScript**, **Tailwind CSS**, and **Google Gemini AI
 - ⚡ **Fast AI-powered conversion**
   - Powered by Google Gemini (`gemini-2.5-flash`)
 - 🎯 **Daily usage limit**
-  - Simple client-side limit (testing-friendly)
+  - Lightweight client-side limit (suitable for testing & demos)
 - 🌗 **Light / Dark mode**
   - System-aware theme toggle
 - ⌨️ **Keyboard support**
@@ -33,6 +33,119 @@ Built with **Next.js**, **TypeScript**, **Tailwind CSS**, and **Google Gemini AI
   - Screen-reader & keyboard friendly
 - 🎨 **Polished UI**
   - Smooth animations & typing effect
+
+---
+
+## ✨ Core Capabilities
+
+### 🌍 Multi-Language Support
+- Supports:
+  - Bangla
+  - English
+  - Hindi
+  - Chinese
+  - Japanese
+  - Arabic
+  - Russian
+  - German
+- Converts everything into **Banglish**
+
+---
+
+### 🔤 Smart Banglish Conversion
+- ✅ Word-by-word Bangla transliteration  
+- ✅ Fixes spelling if input is already Banglish  
+- ✅ Converts foreign languages naturally  
+- ✅ Keeps sentence structure  
+- ✅ Preserves punctuation & tone  
+
+---
+
+### ⚡ AI-Powered
+- Powered by **Google Gemini (gemini-2.5-flash)**
+- Optimized prompt engineering for:
+  - Accuracy
+  - Speed
+  - Chat-style output
+  - Zero hallucination
+
+---
+
+### 🧠 Smart Usage & Credit System
+
+#### FREE Users
+- Daily soft limit
+- Auto reset every 24 hours
+- Ideal for casual use
+
+#### Paid Users
+- Monthly credit limit
+- No daily restriction
+- Higher conversion quota
+
+#### 🔄 Realtime Updates
+- Live usage tracking
+- Firestore `onSnapshot` listener
+- UI updates instantly
+
+---
+
+### 📊 Credit Tracking
+- Daily usage (Free plan)
+- Monthly usage (Paid plans)
+- Auto reset system
+- Live credit display
+- Upgrade CTA when limit reached
+
+---
+
+## 🔁 Credit Logic
+
+### FREE Users
+- 2 conversions per day
+- Resets every 24 hours
+- Daily limit enforced
+
+### Paid Users
+- Monthly quota
+- No daily limit
+- Resets monthly
+
+---
+
+### 🔐 Authentication
+- Google Sign-In (Firebase Auth)
+- Secure session handling
+- Firestore user profile
+- Auto user creation
+
+---
+
+### 💳 Upgrade Flow
+- Upgrade modal
+- Centralized upgrade handler
+- Ready for Stripe / LemonSqueezy
+- Plan-based UI rendering
+
+---
+
+### 🎨 UI / UX Highlights
+- Modern glassmorphism UI
+- Responsive design
+- Smooth typing animation
+- Dark / Light mode
+- Keyboard shortcuts  
+  - `Ctrl + Enter`
+  - `Cmd + Enter`
+- Accessible (ARIA + keyboard support)
+
+---
+
+### 🧠 Intelligent Logic
+- Monthly limit checked first
+- Daily limit only for FREE users
+- Auto reset logic
+- Safe fallback handling
 
 ---
 
@@ -98,8 +211,10 @@ The AI prompt enforces the following rules:
 - Sonner (toast notifications)
 
 ### Backend
+- Firebase Auth
+- Firestore
+- Google Gemini AI
 - Next.js API Routes
-- Google Gemini AI (`@google/genai`)
 
 ## 🧪 Testing
 
@@ -114,3 +229,7 @@ npm test
 # Run tests in watch mode (recommended during development)
 npm run test:watch
 
+```
+
+## ⭐ Support
+If you like this project, please give it a ⭐ on GitHub!
