@@ -9,7 +9,7 @@ const CreditsBar = () => {
 
   return (
     <div className="w-full mb-3 animate-fade-in-up absolute -top-[50px] left-0">
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-4 px-4 py-2.5 bg-card/80 backdrop-blur-xl border-2 border-border/60 rounded-xl shadow-sm pb-10">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-4 px-4 py-2.5 bg-card/80 backdrop-blur-xl border-2 border-border/60 rounded-t-2xl shadow-sm pb-10">
         {/* LEFT SIDE */}
         <span className="text-xs text-muted-foreground font-medium flex items-center gap-2">
           {loading ? (

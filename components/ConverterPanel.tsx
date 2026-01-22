@@ -10,6 +10,7 @@ import { useAuth } from "@/context/AuthContext";
 import { useUpgradePlan } from "@/context/UpgradeContext";
 import { signInWithGoogle } from "@/lib/auth";
 import PricingModal from "./PricingModal";
+import StyleSelector, { TranslationStyle } from "./StyleSelector";
 // import CreditsBar from "./CreditsBar";
 
 export default function ConverterPanel() {
@@ -19,6 +20,7 @@ export default function ConverterPanel() {
   const [isTyping, setIsTyping] = useState(false);
   const [isSigninModalOpen, setIsSigninModalOpen] = useState(false);
   const [pendingConversion, setPendingConversion] = useState(false);
+  const [selectedStyle, setSelectedStyle] = useState<TranslationStyle>("casual");
 
   const { user } = useAuth();
   const { isPricingModalOpen, setIsPricingModalOpen } = useUpgradePlan();
@@ -82,7 +84,7 @@ export default function ConverterPanel() {
       const res = await fetch("/api/convert-to-banglish", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text: inputText }),
+        body: JSON.stringify({ text: inputText, style: selectedStyle }),
       });
 
       const data = await res.json();
@@ -108,7 +110,7 @@ export default function ConverterPanel() {
       setIsConverting(false);
       showError("Something went wrong");
     }
-  }, [user, inputText, isConverting, isTyping]);
+  }, [user, inputText, isConverting, isTyping, selectedStyle]);
 
   useEffect(() => {
     if (!user || !pendingConversion) return;
@@ -131,6 +133,11 @@ export default function ConverterPanel() {
   return (
     <>
       {/* <CreditsBar creditsLeft={100} onUpgrade={() => {}} /> */}
+
+      <StyleSelector
+        selectedStyle={selectedStyle}
+        onStyleChange={setSelectedStyle}
+      />
 
       <TextInput
         onSubmit={handleConvert}

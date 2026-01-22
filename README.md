@@ -50,6 +50,49 @@ Built with **Next.js**, **TypeScript**, **Tailwind CSS**, and **Google Gemini AI
   - German
 - Converts everything into **Banglish**
 
+## 🎭 Style-Based Banglish Conversion
+
+The translator supports **multiple writing styles**, allowing users to generate Banglish that perfectly matches their tone and context.
+
+---
+
+## ✅ Available Styles
+
+| Style | Description |
+|------|-------------|
+| **Casual** | Natural, everyday Banglish for chatting |
+| **Funny** | Light humor, playful tone, fun expressions |
+| **Professional** | Clean, polite, office-friendly Banglish |
+| **Romantic** | Soft, emotional, expressive tone |
+| **Attitude** | Confident, bold, stylish Banglish |
+| **Facebook Post** | Social-friendly, expressive writing |
+| **Storytelling** | Narrative flow with emotional depth |
+
+---
+
+## 🧠 Smart Style Engine
+
+Each style follows a **strict rule-based AI prompt system** to ensure high-quality and consistent output:
+
+- ✅ Converts **any language → Banglish**
+- ✅ Preserves meaning and sentence structure
+- ✅ Fixes spelling if input is already Banglish
+- ✅ Keeps tone consistent per selected style
+- ✅ Prevents unwanted English output
+- ✅ Emoji usage controlled per style
+- ✅ No hallucination or unnecessary rewriting
+
+---
+
+## 🎯 How It Works
+
+1. User selects a **style** (Casual, Funny, Professional, etc.)
+2. User enters text in **any language**
+3. AI applies:
+   - Global Banglish conversion rules  
+   - Style-specific tone logic  
+4. Output is returned as **natural Banglish**
+
 ---
 
 ### 🔤 Smart Banglish Conversion

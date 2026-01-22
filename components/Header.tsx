@@ -2,7 +2,7 @@ import { ArrowRight } from "lucide-react";
 
 const Header = () => {
   return (
-    <header className="text-center mb-8 md:mb-12 animate-fade-in-up">
+    <header className="text-center mb-8 animate-fade-in-up">
       <div className="inline-flex items-center justify-center gap-2 mb-4">
         <div className="px-4 py-2 rounded-xl bg-primary/10 border border-primary/20">
           <span className="text-xl md:text-2xl font-bold text-primary">🌐</span>

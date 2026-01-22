@@ -37,7 +37,7 @@ const TextInput = ({
         onSubmit();
       }}
     >
-      <div className={"w-full animate-fade-in-up [animation-delay:100ms] relative" + (user ? " mt-16 md:mt-24" : "")}>
+      <div className={"w-full animate-fade-in-up [animation-delay:100ms] relative" + (user ? " mt-16" : "")}>
 
         {user && <CreditsBar />}
 
