@@ -172,6 +172,29 @@ Each style follows a **strict rule-based AI prompt system** to ensure high-quali
 
 ---
 
+## 💳 Payment Gateway & Subscription System (Bangladesh 🇧🇩)
+
+The project includes a **Bangladesh-ready subscription payment system** designed for SaaS-style upgrades, using **SSLCommerz** as the primary payment gateway.
+
+This system is built with **security-first backend pricing logic**, ensuring users cannot manipulate plan prices from the client side.
+
+---
+
+### 🔐 Secure Pricing Architecture
+
+- Frontend sends **only the selected plan name**
+- All prices are defined **server-side**
+- Payment amount is calculated securely on the backend
+- Prevents price tampering via DevTools or API calls
+
+```ts
+FREE → ৳0  
+STARTER → ৳499  
+PRO → ৳999  
+BUSINESS → ৳2999
+```
+---
+
 ### 🎨 UI / UX Highlights
 - Modern glassmorphism UI
 - Responsive design

@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { Check, Sparkles, Zap, Building2, User } from "lucide-react";
 import {
   Dialog,
@@ -7,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { useUserPlan } from "@/context/UserPlanContext";
+import { useAuth } from "@/context/AuthContext";
 
 type PricingModalProps = {
   open: boolean;
@@ -16,7 +18,7 @@ type PricingModalProps = {
 const plans = [
   {
     name: "Free",
-    price: "$0",
+    price: "৳0",
     period: "/month",
     icon: User,
     description: "Get started with basic translations",
@@ -32,7 +34,7 @@ const plans = [
   },
   {
     name: "Starter",
-    price: "$5",
+    price: "৳499",
     period: "/month",
     icon: Zap,
     description: "For regular users who need more",
@@ -48,7 +50,7 @@ const plans = [
   },
   {
     name: "Pro",
-    price: "$10",
+    price: "৳999",
     period: "/month",
     icon: Sparkles,
     description: "Best for power users",
@@ -66,7 +68,7 @@ const plans = [
   },
   {
     name: "Business",
-    price: "$29",
+    price: "৳2999",
     period: "/month",
     icon: Building2,
     description: "For teams and enterprises",
@@ -85,6 +87,29 @@ const plans = [
 
 export const PricingModal = ({ open, onOpenChange }: PricingModalProps) => {
   const { plan: currentPlan } = useUserPlan();
+  const { user } = useAuth();
+  const [redirectUrl, setRedirectUrl] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (redirectUrl) {
+      window.location.href = redirectUrl;
+    }
+  }, [redirectUrl]);
+
+  const upgradeToPro = async (planName: string) => {
+    if (!user) return;
+
+    const res = await fetch("/api/payment/init", {
+      method: "POST",
+      body: JSON.stringify({
+        uid: user.uid,
+        plan: planName,
+      }),
+    });
+
+    const { url } = await res.json();
+    setRedirectUrl(url);
+  };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -102,8 +127,8 @@ export const PricingModal = ({ open, onOpenChange }: PricingModalProps) => {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             {plans.map((plan) => {
               const Icon = plan.icon;
-              const isCurrentPlan = plan.name === currentPlan;
-              
+              const isCurrentPlan = String(plan.name).toUpperCase() === String(currentPlan).toUpperCase();
+
               return (
                 <div
                   key={plan.name}
@@ -123,8 +148,8 @@ export const PricingModal = ({ open, onOpenChange }: PricingModalProps) => {
                   <div className="space-y-4">
                     <div className={cn(
                       "inline-flex p-2.5 rounded-xl",
-                      plan.highlighted 
-                        ? "bg-primary/20" 
+                      plan.highlighted
+                        ? "bg-primary/20"
                         : "bg-muted"
                     )}>
                       <Icon className={cn(
@@ -165,6 +190,11 @@ export const PricingModal = ({ open, onOpenChange }: PricingModalProps) => {
                         isCurrentPlan && "cursor-default opacity-70"
                       )}
                       disabled={isCurrentPlan}
+                      onClick={() => {
+                        if (plan.name === "Pro" && !isCurrentPlan) {
+                          upgradeToPro(plan.name.toUpperCase());
+                        }
+                      }}
                     >
                       {isCurrentPlan ? "Current Plan" : plan.buttonText}
                     </Button>
