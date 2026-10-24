@@ -6,8 +6,9 @@ import FlagButton from "@/components/FlagButton";
 import SigninButton from "@/components/SigninButton";
 import ConverterPanel from "@/components/ConverterPanel";
 
-export default function Home() {
+const ticker = ["CASUAL", "FUNNY", "PROFESSIONAL", "ROMANTIC", "ATTITUDE", "FACEBOOK", "STORY"];
 
+export default function Home() {
   return (
     <div className="min-h-screen relative overflow-hidden">
       <FlagButton />
@@ -15,8 +16,15 @@ export default function Home() {
       <SigninButton />
       <FloatingShapes />
 
-      <main className="relative z-10 container max-w-2xl mx-auto px-4 py-20 md:py-24">
+      <main className="relative z-10 container max-w-3xl mx-auto px-4 pt-24 pb-10 md:pt-28">
         <Header />
+        <div aria-hidden="true" className="-mx-4 md:mx-0 mb-10 overflow-hidden border-y-[3px] md:border-[3px] border-ink bg-secondary text-secondary-foreground -rotate-1">
+          <div className="flex w-max animate-nb-marquee py-2 font-black tracking-widest text-sm">
+            {[...ticker, ...ticker, ...ticker, ...ticker].map((t, i) => (
+              <span key={i} className="px-4">{t} ★</span>
+            ))}
+          </div>
+        </div>
         <ConverterPanel />
         <Footer />
       </main>

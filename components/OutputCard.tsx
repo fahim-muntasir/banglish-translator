@@ -1,12 +1,8 @@
 import { useState, memo } from "react";
-import { Check, Copy, RefreshCw, Sparkles } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Check, Copy, RefreshCw } from "lucide-react";
+import { cn } from "@/lib/utils";
 
-interface OutputCardProps {
-  output: string;
-  isTyping: boolean;
-  onClear: () => void;
-}
+interface OutputCardProps { output: string; isTyping: boolean; onClear: () => void; }
 
 const OutputCard = ({ output, isTyping, onClear }: OutputCardProps) => {
   const [copied, setCopied] = useState(false);
@@ -22,68 +18,39 @@ const OutputCard = ({ output, isTyping, onClear }: OutputCardProps) => {
     }
   };
 
-  // Keep the component in the DOM if possible, or use a wrapper to avoid CLS
   if (!output && !isTyping) return null;
 
   return (
-    <div
-      className="w-full animate-fade-in-up [animation-delay:300ms]"
-    >
-      <div className="glass-card p-4 md:p-6 border-2 border-primary/20">
-        <div className="flex items-center justify-between mb-4">
+    <div className="w-full animate-fade-in-up [animation-delay:300ms]">
+      <p className="font-black uppercase text-sm mb-3 tracking-widest">③ Your Banglish</p>
+      <div className="nb-box relative">
+        <div className="flex items-center justify-between gap-2 flex-wrap px-4 py-2 border-b-[3px] border-ink bg-[hsl(var(--lime))] text-[#111]">
+          <span className="font-black uppercase text-sm">★ Output</span>
           <div className="flex items-center gap-2">
-            <div className="p-1.5 rounded-lg bg-primary/10">
-              <Sparkles className="w-4 h-4 text-primary" aria-hidden="true" />
-            </div>
-            <span className="font-semibold text-foreground">Banglish Output</span>
-          </div>
-
-          <div className="flex items-center gap-2">
-            <Button
-              variant="ghost"
-              size="sm"
+            <button
+              type="button"
               onClick={handleCopy}
               disabled={!output || isTyping}
-              className="text-muted-foreground hover:text-foreground transition-colors rounded-xl"
               aria-label="Copy converted text"
+              className={cn("nb-btn px-3 py-1.5 text-xs flex items-center gap-1.5", copied ? "bg-secondary animate-nb-pop" : "bg-white")}
             >
-              {copied ? (
-                <>
-                  <Check className="w-4 h-4 mr-1.5 text-primary" aria-hidden="true" />
-                  <span className="text-primary">Copied!</span>
-                </>
-              ) : (
-                <>
-                  <Copy className="w-4 h-4 mr-1.5" aria-hidden="true" />
-                  Copy
-                </>
-              )}
-            </Button>
-
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={onClear}
-              className="text-muted-foreground hover:text-foreground transition-colors rounded-xl"
-              aria-label="Clear output"
-            >
-              <RefreshCw className="w-4 h-4 mr-1.5" aria-hidden="true" />
+              {copied ? <Check className="w-4 h-4" strokeWidth={4} aria-hidden="true" /> : <Copy className="w-4 h-4" strokeWidth={3} aria-hidden="true" />}
+              {copied ? "Copied!" : "Copy"}
+            </button>
+            <button type="button" onClick={onClear} aria-label="Clear output" className="nb-btn bg-white px-3 py-1.5 text-xs flex items-center gap-1.5">
+              <RefreshCw className="w-4 h-4" strokeWidth={3} aria-hidden="true" />
               Clear
-            </Button>
+            </button>
           </div>
         </div>
 
-        {/* white-space: pre-wrap ensures line breaks from the API are preserved */}
-        <div className="min-h-[120px] md:min-h-[150px] text-foreground text-base md:text-lg leading-relaxed whitespace-pre-wrap">
-          <p className={isTyping ? 'typing-cursor' : ''}>
-            {output}
-          </p>
+        <div className="p-4 md:p-6 min-h-[120px] md:min-h-[150px] text-base md:text-xl leading-relaxed font-semibold whitespace-pre-wrap">
+          <p className={isTyping ? "typing-cursor" : ""}>{output}</p>
         </div>
 
         {output && !isTyping && (
-          <div className="flex items-center justify-center gap-2 mt-4 pt-4 border-t border-border/50 animate-in fade-in zoom-in duration-300">
-            <span className="text-2xl" role="img" aria-label="party popper">🎉</span>
-            <span className="text-sm text-muted-foreground font-medium">Conversion complete!</span>
+          <div className="absolute -bottom-5 right-4 nb-sticker bg-secondary px-3 py-1 text-sm animate-nb-pop">
+            🎉 LEVEL CLEAR!
           </div>
         )}
       </div>

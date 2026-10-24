@@ -3,7 +3,7 @@
 import { useState, useCallback, useRef, useEffect } from "react";
 import TextInput from "@/components/TextInput";
 import OutputCard from "@/components/OutputCard";
-import { canUserConvert, increaseUsage } from "@/lib/usageLimit";
+import { canUserConvert } from "@/lib/usageLimit";
 import { showLimitError, showError } from "@/lib/alert";
 import SigninModal from "./SigninModal";
 import { useAuth } from "@/context/AuthContext";
@@ -81,17 +81,32 @@ export default function ConverterPanel() {
     setOutputText("");
 
     try {
-      const res = await fetch("/api/convert-to-banglish", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text: inputText, style: selectedStyle }),
-      });
+      const sendConversion = (idToken: string) =>
+        fetch("/api/convert-to-banglish", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${idToken}`,
+          },
+          body: JSON.stringify({ text: inputText, style: selectedStyle }),
+        });
+
+      let res = await sendConversion(await user.getIdToken());
+      if (res.status === 401) {
+        res = await sendConversion(await user.getIdToken(true));
+      }
 
       const data = await res.json();
+      if (!res.ok) {
+        if (res.status === 429) {
+          showLimitError("Your conversion limit has been reached. Try again later or upgrade your plan!");
+        } else {
+          showError(data.error || "Conversion failed");
+        }
+        setIsConverting(false);
+        return;
+      }
       const converted = data.convertedText || "Conversion failed";
-
-      // Increase usage count
-      await increaseUsage(user.uid);
 
       setIsTyping(true);
       setIsConverting(false);

@@ -1,11 +1,6 @@
 import { useEffect, useState } from "react";
 import { Check, Sparkles, Zap, Building2, User } from "lucide-react";
-import {
-  Dialog,
-  DialogContent,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
 import { useUserPlan } from "@/context/UserPlanContext";
 import { useAuth } from "@/context/AuthContext";
@@ -13,75 +8,32 @@ import { useAuth } from "@/context/AuthContext";
 type PricingModalProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-}
+};
 
 const plans = [
   {
-    name: "Free",
-    price: "৳0",
-    period: "/month",
-    icon: User,
-    description: "Get started with basic translations",
-    features: [
-      "50 translations/month",
-      "Basic quality",
-      "Standard response time",
-      "Community support",
-    ],
-    buttonText: "Current Plan",
-    buttonVariant: "outline" as const,
-    highlighted: false,
+    name: "Free", price: "৳0", period: "/month", icon: User, tilt: "-rotate-1",
+    bg: "bg-white", description: "Get started with basic translations",
+    features: ["50 translations/month", "Basic quality", "Standard response time", "Community support"],
+    buttonText: "Current Plan", highlighted: false,
   },
   {
-    name: "Starter",
-    price: "৳499",
-    period: "/month",
-    icon: Zap,
-    description: "For regular users who need more",
-    features: [
-      "500 translations/month",
-      "Faster response",
-      "Priority queue",
-      "Email support",
-    ],
-    buttonText: "Upgrade",
-    buttonVariant: "default" as const,
-    highlighted: false,
+    name: "Starter", price: "৳499", period: "/month", icon: Zap, tilt: "rotate-1",
+    bg: "bg-[hsl(210_100%_75%)]", description: "For regular users who need more",
+    features: ["500 translations/month", "Faster response", "Priority queue", "Email support"],
+    buttonText: "Upgrade", highlighted: false,
   },
   {
-    name: "Pro",
-    price: "৳999",
-    period: "/month",
-    icon: Sparkles,
-    description: "Best for power users",
-    features: [
-      "3,000 translations/month",
-      "Fastest response",
-      "Best quality output",
-      "Priority support",
-      "Advanced features",
-    ],
-    buttonText: "Upgrade",
-    buttonVariant: "default" as const,
-    highlighted: true,
-    badge: "Most Popular",
+    name: "Pro", price: "৳999", period: "/month", icon: Sparkles, tilt: "-rotate-1",
+    bg: "bg-secondary", description: "Best for power users",
+    features: ["3,000 translations/month", "Fastest response", "Best quality output", "Priority support", "Advanced features"],
+    buttonText: "Upgrade", highlighted: true, badge: "Most Popular",
   },
   {
-    name: "Business",
-    price: "৳2999",
-    period: "/month",
-    icon: Building2,
-    description: "For teams and enterprises",
-    features: [
-      "Unlimited translations",
-      "Highest priority",
-      "API access",
-      "Dedicated support",
-      "Custom integrations",
-    ],
-    buttonText: "Contact Us",
-    buttonVariant: "outline" as const,
-    highlighted: false,
+    name: "Business", price: "৳2999", period: "/month", icon: Building2, tilt: "rotate-1",
+    bg: "bg-[hsl(var(--lime))]", description: "For teams and enterprises",
+    features: ["Unlimited translations", "Highest priority", "API access", "Dedicated support", "Custom integrations"],
+    buttonText: "Contact Us", highlighted: false,
   },
 ];
 
@@ -91,40 +43,35 @@ export const PricingModal = ({ open, onOpenChange }: PricingModalProps) => {
   const [redirectUrl, setRedirectUrl] = useState<string | null>(null);
 
   useEffect(() => {
-    if (redirectUrl) {
-      window.location.href = redirectUrl;
-    }
+    if (redirectUrl) window.location.href = redirectUrl;
   }, [redirectUrl]);
 
   const upgradeToPro = async (planName: string) => {
     if (!user) return;
-
     const res = await fetch("/api/payment/init", {
       method: "POST",
-      body: JSON.stringify({
-        uid: user.uid,
-        plan: planName,
-      }),
+      body: JSON.stringify({ uid: user.uid, plan: planName }),
     });
-
     const { url } = await res.json();
     setRedirectUrl(url);
   };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-5xl p-0 overflow-hidden border-0 bg-background/90 backdrop-blur-xl shadow-2xl max-h-[90vh] overflow-y-auto">
-        <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5 pointer-events-none" />
+      <DialogContent className="sm:max-w-5xl !rounded-none p-0 border-[3px] border-ink bg-background shadow-[8px_8px_0_hsl(var(--ink))] max-h-[90vh] overflow-y-auto">
+        <div className="h-3 bg-[repeating-linear-gradient(45deg,hsl(var(--sun))_0_14px,hsl(var(--ink))_14px_28px)] border-b-[3px] border-ink" aria-hidden="true" />
 
-        <div className="relative px-6 py-8 sm:px-10 sm:py-12">
-          <div className="text-center mb-10">
-            <h2 className="text-3xl font-bold tracking-tight">Choose your plan</h2>
-            <p className="mt-2 text-muted-foreground">
+        <div className="px-4 py-8 sm:px-10 sm:py-10">
+          <div className="text-center mb-12">
+            <DialogTitle className="text-4xl sm:text-5xl font-black uppercase tracking-tighter leading-none">
+              <span className="inline-block nb-sticker bg-accent px-3 py-1 -rotate-2">Choose your plan</span>
+            </DialogTitle>
+            <DialogDescription className="mt-4 font-bold text-foreground/80">
               Unlock more translations and premium features
-            </p>
+            </DialogDescription>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {plans.map((plan) => {
               const Icon = plan.icon;
               const isCurrentPlan = String(plan.name).toUpperCase() === String(currentPlan).toUpperCase();
@@ -133,78 +80,61 @@ export const PricingModal = ({ open, onOpenChange }: PricingModalProps) => {
                 <div
                   key={plan.name}
                   className={cn(
-                    "relative group rounded-2xl p-6 transition-all duration-300",
-                    plan.highlighted
-                      ? "bg-gradient-to-b from-primary/10 to-primary/5 border-2 border-primary/30 shadow-lg shadow-primary/10"
-                      : "bg-card/50 border border-border/50 hover:border-border hover:shadow-md"
+                    "nb-box relative flex flex-col p-5 transition-transform duration-150 hover:-translate-y-1.5 hover:rotate-0",
+                    plan.tilt,
+                    plan.highlighted && "lg:scale-105 shadow-[8px_8px_0_hsl(var(--accent))]"
                   )}
                 >
                   {plan.badge && (
-                    <Badge className="absolute -top-3 left-1/2 -translate-x-1/2 bg-primary text-primary-foreground shadow-lg">
-                      {plan.badge}
-                    </Badge>
+                    <span className="absolute -top-4 left-1/2 -translate-x-1/2 nb-sticker bg-accent px-3 py-1 text-xs uppercase whitespace-nowrap animate-nb-bounce">
+                      ★ {plan.badge}
+                    </span>
                   )}
+                  {/* {isCurrentPlan && (
+                    <span className="absolute -top-3 -right-2 nb-sticker bg-[hsl(var(--lime))] px-2 py-0.5 text-[10px] uppercase rotate-6">
+                      You are here
+                    </span>
+                  )} */}
 
-                  <div className="space-y-4">
-                    <div className={cn(
-                      "inline-flex p-2.5 rounded-xl",
-                      plan.highlighted
-                        ? "bg-primary/20"
-                        : "bg-muted"
-                    )}>
-                      <Icon className={cn(
-                        "h-5 w-5",
-                        plan.highlighted ? "text-primary" : "text-muted-foreground"
-                      )} />
-                    </div>
-
-                    <div>
-                      <h3 className="font-semibold text-lg">{plan.name}</h3>
-                      <p className="text-sm text-muted-foreground mt-1">
-                        {plan.description}
-                      </p>
-                    </div>
-
-                    <div className="flex items-baseline gap-1">
-                      <span className="text-3xl font-bold">{plan.price}</span>
-                      <span className="text-muted-foreground text-sm">{plan.period}</span>
-                    </div>
-
-                    <ul className="space-y-2.5 py-4 border-t border-border/50">
-                      {plan.features.map((feature) => (
-                        <li key={feature} className="flex items-start gap-2 text-sm">
-                          <Check className={cn(
-                            "h-4 w-4 mt-0.5 shrink-0",
-                            plan.highlighted ? "text-primary" : "text-muted-foreground"
-                          )} />
-                          <span className="text-foreground/80">{feature}</span>
-                        </li>
-                      ))}
-                    </ul>
-
-                    <Button
-                      variant={isCurrentPlan ? "outline" : plan.buttonVariant}
-                      className={cn(
-                        "w-full rounded-xl transition-all",
-                        plan.highlighted && !isCurrentPlan && "bg-primary hover:bg-primary/90 shadow-md",
-                        isCurrentPlan && "cursor-default opacity-70"
-                      )}
-                      disabled={isCurrentPlan}
-                      onClick={() => {
-                        if (plan.name === "Pro" && !isCurrentPlan) {
-                          upgradeToPro(plan.name.toUpperCase());
-                        }
-                      }}
-                    >
-                      {isCurrentPlan ? "Current Plan" : plan.buttonText}
-                    </Button>
+                  <div className={cn("inline-flex self-start p-2.5 border-[3px] border-ink text-[#111]", plan.bg)}>
+                    <Icon className="h-5 w-5" strokeWidth={3} aria-hidden="true" />
                   </div>
+
+                  <h3 className="mt-4 font-black text-2xl uppercase tracking-tight">{plan.name}</h3>
+                  <p className="text-sm font-semibold text-muted-foreground mt-1 min-h-[40px]">{plan.description}</p>
+
+                  <div className="flex items-baseline gap-1 mt-3">
+                    <span className="text-4xl font-black tracking-tighter">{plan.price}</span>
+                    <span className="text-sm font-bold text-muted-foreground">{plan.period}</span>
+                  </div>
+
+                  <ul className="space-y-2.5 py-4 mt-4 border-t-[3px] border-ink flex-1">
+                    {plan.features.map((feature) => (
+                      <li key={feature} className="flex items-start gap-2 text-sm font-semibold">
+                        <span className={cn("mt-0.5 shrink-0 border-2 border-ink p-0.5 text-[#111]", plan.bg)}>
+                          <Check className="h-3 w-3" strokeWidth={4} aria-hidden="true" />
+                        </span>
+                        <span>{feature}</span>
+                      </li>
+                    ))}
+                  </ul>
+
+                  <button
+                    type="button"
+                    disabled={isCurrentPlan}
+                    className={cn("nb-btn w-full py-3 text-sm mt-2", isCurrentPlan ? "bg-muted" : plan.highlighted ? "bg-accent" : plan.bg)}
+                    onClick={() => {
+                      if (plan.name === "Pro" && !isCurrentPlan) upgradeToPro(plan.name.toUpperCase());
+                    }}
+                  >
+                    {isCurrentPlan ? "Current Plan" : plan.buttonText}
+                  </button>
                 </div>
               );
             })}
           </div>
 
-          <p className="text-center text-xs text-muted-foreground/60 mt-8">
+          <p className="text-center text-xs font-bold text-muted-foreground mt-10">
             All plans include access to our core translation engine. Cancel anytime.
           </p>
         </div>
