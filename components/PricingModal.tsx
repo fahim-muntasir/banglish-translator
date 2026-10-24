@@ -4,6 +4,7 @@ import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/compone
 import { cn } from "@/lib/utils";
 import { useUserPlan } from "@/context/UserPlanContext";
 import { useAuth } from "@/context/AuthContext";
+import { showError } from "@/lib/alert";
 
 type PricingModalProps = {
   open: boolean;
@@ -18,19 +19,19 @@ const plans = [
     buttonText: "Current Plan", highlighted: false,
   },
   {
-    name: "Starter", price: "৳499", period: "/month", icon: Zap, tilt: "rotate-1",
+    name: "Starter", price: "৳499", period: "/one-time", icon: Zap, tilt: "rotate-1",
     bg: "bg-[hsl(210_100%_75%)]", description: "For regular users who need more",
     features: ["500 translations/month", "Faster response", "Priority queue", "Email support"],
     buttonText: "Upgrade", highlighted: false,
   },
   {
-    name: "Pro", price: "৳999", period: "/month", icon: Sparkles, tilt: "-rotate-1",
+    name: "Pro", price: "৳999", period: "/one-time", icon: Sparkles, tilt: "-rotate-1",
     bg: "bg-secondary", description: "Best for power users",
     features: ["3,000 translations/month", "Fastest response", "Best quality output", "Priority support", "Advanced features"],
     buttonText: "Upgrade", highlighted: true, badge: "Most Popular",
   },
   {
-    name: "Business", price: "৳2999", period: "/month", icon: Building2, tilt: "rotate-1",
+    name: "Business", price: "৳2999", period: "/one-time", icon: Building2, tilt: "rotate-1",
     bg: "bg-[hsl(var(--lime))]", description: "For teams and enterprises",
     features: ["Unlimited translations", "Highest priority", "API access", "Dedicated support", "Custom integrations"],
     buttonText: "Contact Us", highlighted: false,
@@ -41,6 +42,7 @@ export const PricingModal = ({ open, onOpenChange }: PricingModalProps) => {
   const { plan: currentPlan } = useUserPlan();
   const { user } = useAuth();
   const [redirectUrl, setRedirectUrl] = useState<string | null>(null);
+  const [isStartingPayment, setIsStartingPayment] = useState(false);
 
   useEffect(() => {
     if (redirectUrl) window.location.href = redirectUrl;
@@ -48,12 +50,32 @@ export const PricingModal = ({ open, onOpenChange }: PricingModalProps) => {
 
   const upgradeToPro = async (planName: string) => {
     if (!user) return;
-    const res = await fetch("/api/payment/init", {
-      method: "POST",
-      body: JSON.stringify({ uid: user.uid, plan: planName }),
-    });
-    const { url } = await res.json();
-    setRedirectUrl(url);
+    setIsStartingPayment(true);
+    try {
+      const res = await fetch("/api/payment/init", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${await user.getIdToken()}`,
+        },
+        body: JSON.stringify({ plan: planName }),
+      });
+      const result: unknown = await res.json();
+      if (
+        !res.ok ||
+        !result ||
+        typeof result !== "object" ||
+        !("url" in result) ||
+        typeof result.url !== "string"
+      ) {
+        throw new Error("Payment initialization failed");
+      }
+      setRedirectUrl(result.url);
+    } catch (error) {
+      console.error("Payment initialization request failed", error);
+      showError("Unable to start payment. Please try again.");
+      setIsStartingPayment(false);
+    }
   };
 
   return (
@@ -121,7 +143,7 @@ export const PricingModal = ({ open, onOpenChange }: PricingModalProps) => {
 
                   <button
                     type="button"
-                    disabled={isCurrentPlan}
+                    disabled={isCurrentPlan || isStartingPayment}
                     className={cn("nb-btn w-full py-3 text-sm mt-2", isCurrentPlan ? "bg-muted" : plan.highlighted ? "bg-accent" : plan.bg)}
                     onClick={() => {
                       if (plan.name === "Pro" && !isCurrentPlan) upgradeToPro(plan.name.toUpperCase());
@@ -135,7 +157,7 @@ export const PricingModal = ({ open, onOpenChange }: PricingModalProps) => {
           </div>
 
           <p className="text-center text-xs font-bold text-muted-foreground mt-10">
-            All plans include access to our core translation engine. Cancel anytime.
+            Payments are one-time. Paid plans currently do not renew or expire automatically.
           </p>
         </div>
       </DialogContent>

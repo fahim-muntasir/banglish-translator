@@ -1,0 +1,61 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /users/{userId} {
+      function isOwner() {
+        return request.auth != null && request.auth.uid == userId;
+      }
+
+      function isValidInitialProfile() {
+        return request.resource.data.keys().hasAll([
+            'uid',
+            'name',
+            'email',
+            'photo',
+            'plan',
+            'dailyUsage',
+            'lastUsageReset',
+            'usage',
+            'totalTranslations',
+            'isBlocked',
+            'createdAt',
+            'lastLogin'
+          ])
+          && request.resource.data.keys().hasOnly([
+            'uid',
+            'name',
+            'email',
+            'photo',
+            'plan',
+            'dailyUsage',
+            'lastUsageReset',
+            'usage',
+            'totalTranslations',
+            'isBlocked',
+            'createdAt',
+            'lastLogin'
+          ])
+          && request.resource.data.uid == userId
+          && request.resource.data.plan == 'FREE'
+          && request.resource.data.dailyUsage == 0
+          && request.resource.data.usage.count == 0
+          && request.resource.data.isBlocked == false
+          && request.resource.data.totalTranslations == 0
+          && request.resource.data.createdAt is timestamp
+          && request.resource.data.lastLogin is timestamp;
+      }
+
+      allow read: if isOwner();
+      allow create: if isOwner() && isValidInitialProfile();
+      allow update: if isOwner()
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['lastLogin'])
+        && request.resource.data.lastLogin is timestamp;
+      allow delete: if false;
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

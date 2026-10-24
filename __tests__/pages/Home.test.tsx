@@ -1,6 +1,14 @@
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import Home from "@/app/page";
 
+let mockUser: {
+  uid: string;
+  getIdToken: jest.Mock;
+} | null = {
+  uid: "test-user",
+  getIdToken: jest.fn().mockResolvedValue("test-token"),
+};
+
 global.fetch = jest.fn(() =>
   Promise.resolve({
     ok: true,
@@ -11,9 +19,28 @@ global.fetch = jest.fn(() =>
   })
 ) as jest.Mock;
 
-jest.mock("@/lib/usageLimit", () => ({
-  canUserConvert: () => true,
-  increaseUsage: jest.fn(),
+jest.mock("@/context/AuthContext", () => ({
+  useAuth: () => ({ user: mockUser }),
+}));
+
+jest.mock("@/lib/auth", () => ({
+  signInWithGoogle: jest.fn(),
+  logout: jest.fn(),
+}));
+
+jest.mock("@/components/SigninButton", () => ({
+  __esModule: true,
+  default: () => null,
+}));
+
+jest.mock("@/components/PricingModal", () => ({
+  __esModule: true,
+  default: () => null,
+}));
+
+jest.mock("@/components/CreditsBar", () => ({
+  __esModule: true,
+  default: () => null,
 }));
 
 jest.mock("@/lib/alert", () => ({
@@ -43,6 +70,13 @@ jest.mock("@/components/Header", () => ({
 }));
 
 describe("Home Page", () => {
+  beforeEach(() => {
+    mockUser = {
+      uid: "test-user",
+      getIdToken: jest.fn().mockResolvedValue("test-token"),
+    };
+  });
+
   it("renders the page correctly", () => {
     render(<Home />);
 
@@ -88,6 +122,28 @@ describe("Home Page", () => {
       expect(
         screen.getByText("aj akash khub sundor")
       ).toBeInTheDocument();
+    });
+  });
+
+  it("resumes a pending conversion after sign-in", async () => {
+    mockUser = null;
+    const { rerender } = render(<Home />);
+
+    fireEvent.change(screen.getByPlaceholderText(/type or paste text/i), {
+      target: { value: "আজ আকাশ খুব সুন্দর" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: /convert to banglish/i }));
+
+    expect(document.querySelector('button[type="submit"]')).toBeEnabled();
+
+    mockUser = {
+      uid: "test-user",
+      getIdToken: jest.fn().mockResolvedValue("test-token"),
+    };
+    rerender(<Home />);
+
+    await waitFor(() => {
+      expect(screen.getByText("aj akash khub sundor")).toBeInTheDocument();
     });
   });
 });

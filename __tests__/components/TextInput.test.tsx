@@ -1,4 +1,14 @@
 import { render, screen, fireEvent } from "@testing-library/react";
+
+jest.mock("@/components/CreditsBar", () => ({
+  __esModule: true,
+  default: () => null,
+}));
+
+jest.mock("@/context/AuthContext", () => ({
+  useAuth: () => ({ user: null }),
+}));
+
 import TextInput from "@/components/TextInput";
 
 describe("TextInput", () => {

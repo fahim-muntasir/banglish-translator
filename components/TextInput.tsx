@@ -13,7 +13,7 @@ type TextInputProps = {
   maxLength?: number;
 };
 
-const TextInput = ({ value, onChange, onSubmit, isLoading, disabled, maxLength = 500 }: TextInputProps) => {
+const TextInput = ({ value, onChange, onSubmit, isLoading, disabled, maxLength = 4000 }: TextInputProps) => {
   const { user } = useAuth();
 
   const handleChange = (e: ChangeEvent<HTMLTextAreaElement>) => {

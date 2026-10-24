@@ -1,21 +1,10 @@
-import { NextResponse, NextRequest } from 'next/server';
+import { NextRequest } from "next/server";
+import { paymentRedirect } from "@/lib/paymentRedirect";
 
-export async function POST(request: NextRequest): Promise<NextResponse> {
-  try {
-    return NextResponse.redirect(
-      new URL('/payment/cancelled', request.url)
-    );
-  } catch (error) {
-    console.error('Cancel callback error:', error);
-    return NextResponse.redirect(
-      new URL('/payment/error', request.url)
-    );
-  }
+export function POST(request: NextRequest) {
+  return paymentRedirect(request, "/payment/cancelled");
 }
 
-export async function GET(request: NextRequest) {
-  
-  return NextResponse.redirect(
-    new URL('/payment/cancelled', request.url)
-  );
+export function GET(request: NextRequest) {
+  return paymentRedirect(request, "/payment/cancelled");
 }

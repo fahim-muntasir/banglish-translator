@@ -1,8 +1,8 @@
 import { cn } from "@/lib/utils";
 import { MessageCircle, Laugh, Briefcase, Heart, Share2, BookOpen, Flame } from "lucide-react";
+import type { TranslationStyle } from "@/lib/conversionPrompts";
 
-export type TranslationStyle =
-  | "casual" | "funny" | "professional" | "romantic" | "attitude" | "facebook" | "storytelling";
+export type { TranslationStyle } from "@/lib/conversionPrompts";
 
 type StyleOption = { id: TranslationStyle; label: string; icon: React.ReactNode; bg: string };
 

@@ -1,11 +1,11 @@
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import ThemeToggle from "@/components/ThemeToggle";
 
 describe("ThemeToggle", () => {
-  it("toggles theme on click", () => {
+  it("toggles theme on click", async () => {
     render(<ThemeToggle />);
 
-    const button = screen.getByRole("button", { name: /Switch to dark mode/i });
+    const button = await screen.findByRole("button", { name: /Switch to dark mode/i });
 
     expect(document.documentElement.classList.contains("dark")).toBe(false);
 
@@ -13,7 +13,8 @@ describe("ThemeToggle", () => {
     expect(document.documentElement.classList.contains("dark")).toBe(true);
 
     fireEvent.click(button);
-    expect(document.documentElement.classList.contains("dark")).toBe(false);
+    await waitFor(() =>
+      expect(document.documentElement.classList.contains("dark")).toBe(false)
+    );
   });
 });
-
