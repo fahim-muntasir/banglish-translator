@@ -1,48 +1,38 @@
-import { ArrowRight, Loader2, Sparkles } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { ArrowRight, Sparkles } from "lucide-react";
 
-interface ConvertButtonProps {
-  isLoading: boolean;
-  disabled: boolean;
-}
+interface ConvertButtonProps { isLoading: boolean; disabled: boolean; }
 
-const ConvertButton = ({ isLoading, disabled }: ConvertButtonProps) => {
-  return (
-    <div className="flex justify-center my-6 md:my-8 animate-fade-in-up [animation-delay:200ms]">
-      <Button
-        type="submit"
-        disabled={disabled || isLoading}
-        className="gradient-button min-w-[240px] border-0 text-accent-foreground font-semibold text-base md:text-lg px-8 py-6 rounded-2xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed group relative overflow-hidden"
-        size="lg"
-        aria-disabled={disabled || isLoading}
-        aria-describedby="convert-help"
-      >
-        <span className="flex items-center justify-center relative z-10">
-          {isLoading ? (
-            <>
-              <Loader2 className="w-5 h-5 mr-2 animate-spin" aria-hidden="true" />
-              <span>Converting...</span>
-            </>
-          ) : (
-            <>
-              <Sparkles className="w-5 h-5 mr-2 group-hover:animate-bounce-gentle" aria-hidden="true" />
-              Convert to Banglish
-              <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" aria-hidden="true" />
-            </>
-          )}
-        </span>
-
-        {/* Shimmer effect */}
-        {!isLoading && !disabled && (
-          <div className="absolute inset-0 motion-safe:animate-shimmer opacity-30 pointer-events-none" />
+const ConvertButton = ({ isLoading, disabled }: ConvertButtonProps) => (
+  <div className="flex flex-col items-center my-8 animate-fade-in-up [animation-delay:200ms]">
+    <button
+      type="submit"
+      disabled={disabled || isLoading}
+      aria-busy={isLoading}
+      aria-describedby="convert-help"
+      className="nb-btn bg-accent w-full sm:w-auto sm:min-w-[320px] px-8 py-5 text-lg md:text-xl group"
+    >
+      <span className="flex items-center justify-center gap-3">
+        {isLoading ? (
+          <>
+            <span className="flex gap-1" aria-hidden="true">
+              {[0, 1, 2].map((i) => (
+                <span key={i} className="w-3 h-3 bg-[#111] animate-nb-bounce" style={{ animationDelay: `${i * 120}ms` }} />
+              ))}
+            </span>
+            Converting...
+          </>
+        ) : (
+          <>
+            <Sparkles className="w-6 h-6" strokeWidth={3} aria-hidden="true" />
+            Convert to Banglish
+            <ArrowRight className="w-6 h-6 group-hover:translate-x-1 transition-transform" strokeWidth={3} aria-hidden="true" />
+          </>
         )}
-      </Button>
-
-      <p id="convert-help" className="sr-only">
-        Enter text before converting
-      </p>
-    </div>
-  );
-};
-
+      </span>
+    </button>
+    <p id="convert-help" className="mt-3 text-xs font-bold text-muted-foreground">
+      Tip: Ctrl/⌘ + Enter to fire
+    </p>
+  </div>
+);
 export default ConvertButton;

@@ -1,16 +1,68 @@
 import { NextRequest, NextResponse } from "next/server";
 import { GoogleGenAI } from "@google/genai";
+import { FirebaseAuthError } from "firebase-admin/auth";
+import { adminAuth } from "@/lib/firebaseAdmin";
+import { releaseConversion, reserveConversion } from "@/lib/serverUsage";
+
+export const runtime = "nodejs";
 
 const ai = new GoogleGenAI({
   apiKey: process.env.GEMINI_API_KEY,
 });
 
 export async function POST(req: NextRequest) {
-  try {
-    const { text, style } = await req.json();
+  const authorization = req.headers.get("authorization");
+  const token = authorization?.match(/^Bearer (.+)$/i)?.[1];
+  if (!token) {
+    return NextResponse.json({ error: "Authentication required" }, { status: 401 });
+  }
 
-    if (!text) {
+  let uid: string;
+  try {
+    ({ uid } = await adminAuth.verifyIdToken(token));
+  } catch (error) {
+    if (error instanceof FirebaseAuthError) {
+      console.error("Firebase ID token verification failed", {
+        code: error.code,
+        message: error.message,
+      });
+
+      const projectMismatch =
+        error.code === "auth/argument-error" &&
+        /incorrect "(aud|iss)" claim|same Firebase project/i.test(error.message);
+
+      return NextResponse.json(
+        {
+          error: projectMismatch
+            ? "Authentication project mismatch"
+            : "Invalid authentication token",
+        },
+        { status: projectMismatch ? 500 : 401 },
+      );
+    }
+
+    console.error("Firebase ID token verification is unavailable", error);
+    return NextResponse.json(
+      { error: "Authentication verification unavailable" },
+      { status: 500 },
+    );
+  }
+
+  let reservation:
+    | Awaited<ReturnType<typeof reserveConversion>> & { allowed: true }
+    | undefined;
+  try {
+    const body: unknown = await req.json();
+    if (!body || typeof body !== "object") {
+      return NextResponse.json({ error: "Invalid request body" }, { status: 400 });
+    }
+    const { text, style } = body as { text?: unknown; style?: unknown };
+
+    if (typeof text !== "string" || !text.trim()) {
       return NextResponse.json({ error: "No text provided" }, { status: 400 });
+    }
+    if (text.length > 4000) {
+      return NextResponse.json({ error: "Text exceeds the 4000 character limit" }, { status: 413 });
     }
 
     const validStyles = [
@@ -22,35 +74,22 @@ export async function POST(req: NextRequest) {
       "facebook",
       "storytelling",
     ] as const;
-    if (!validStyles.includes(style)) {
+    
+    const validStyle = validStyles.find((candidate) => candidate === style);
+
+    if (!validStyle) {
       return NextResponse.json(
         { error: "Invalid style selected" },
         { status: 400 },
       );
     }
 
-    // const prompt = `
-    //   Convert the following text into casual Banglish (Romanized Bangla) suitable for modern social media, chats, and messaging:
-
-    //   "${text}"
-
-    //   Rules:
-    //   - Convert all languages into Banglish (Romanized Bangla), EXCEPT short casual English chat words.
-    //   - For Bangla text: transliterate strictly and exactly into Banglish (word by word), keeping meaning and structure intact.
-    //   - If the input is already Banglish:
-    //     - DO NOT rewrite or translate it.
-    //     - Only fix spelling or typing mistakes.
-    //     - Do NOT change sentence structure, wording, or tone.
-    //   - For other languages (English, Hindi, Arabic, Chinese, etc.): convert them into Banglish as naturally spoken in casual conversation.
-    //   - Preserve only short, commonly used English chat words (hi, hello, ok, okay, wow).
-    //   - Do NOT preserve full English sentences; convert them into Banglish (e.g., "How are you?" → "tumi kamon acho?").
-    //   - Keep it friendly, simple, and easy to read.
-    //   - Use commonly spoken Banglish words.
-    //   - Avoid formal grammar.
-    //   - Preserve punctuation and line breaks.
-    //   - Use emojis only if they naturally fit.
-    //   - Output ONLY the Banglish text. Do not add explanations.
-    //   `;
+    const result = await reserveConversion(uid);
+    if (!result.allowed) {
+      const status = result.reason === "ACCOUNT_UNAVAILABLE" ? 403 : 429;
+      return NextResponse.json({ error: result.reason }, { status });
+    }
+    reservation = result;
 
     const BASE_RULES = `
     You are a Banglish conversion engine.
@@ -164,7 +203,7 @@ export async function POST(req: NextRequest) {
       storytelling: STORYTELLING_PROMPT,
     } as const;
 
-    const finalPrompt = PROMPTS[style as keyof typeof PROMPTS];
+    const finalPrompt = PROMPTS[validStyle];
 
     // Use Gemini API to generate Banglish
     const response = await ai.models.generateContent({
@@ -177,6 +216,13 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ convertedText });
   } catch (err) {
     console.error(err);
+    if (reservation?.allowed) {
+      try {
+        await releaseConversion(uid, reservation.reservation);
+      } catch (releaseError) {
+        console.error("Failed to release conversion usage reservation", releaseError);
+      }
+    }
     return NextResponse.json(
       { error: "Failed to convert text" },
       { status: 500 },

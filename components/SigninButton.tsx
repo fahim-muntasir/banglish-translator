@@ -16,14 +16,12 @@ const SigninButton = () => {
     }
   };
 
-  if (user) {
-    return <UserProfileCard />;
-  }
+  if (user) return <UserProfileCard />;
 
   return (
     <button
       onClick={handleGoogleLogin}
-      className="fixed text-sm top-4 right-20 z-50 p-3 rounded-xl bg-card/80 backdrop-blur-xl border border-border/50 shadow-lg hover:scale-105 active:scale-95 transition-all"
+      className="nb-chip fixed top-4 right-20 z-50 h-[46px] px-4 text-sm uppercase bg-secondary text-[#111]"
     >
       Sign In
     </button>

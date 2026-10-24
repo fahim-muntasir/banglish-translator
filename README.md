@@ -23,8 +23,8 @@ Built with **Next.js**, **TypeScript**, **Tailwind CSS**, and **Google Gemini AI
   - Fixes spelling if the input is already Banglish
 - ⚡ **Fast AI-powered conversion**
   - Powered by Google Gemini (`gemini-2.5-flash`)
-- 🎯 **Daily usage limit**
-  - Lightweight client-side limit (suitable for testing & demos)
+- 🎯 **Usage limits**
+  - Enforced by the server against authenticated Firebase users
 - 🌗 **Light / Dark mode**
   - System-aware theme toggle
 - ⌨️ **Keyboard support**
@@ -117,7 +117,7 @@ Each style follows a **strict rule-based AI prompt system** to ensure high-quali
 ### 🧠 Smart Usage & Credit System
 
 #### FREE Users
-- Daily soft limit
+- Daily usage limit enforced by the server
 - Auto reset every 24 hours
 - Ideal for casual use
 
@@ -249,8 +249,7 @@ The AI prompt enforces the following rules:
 
 ## 🧩 Future Improvements
 
-- Server-side rate limiting
-- User accounts and login
+- IP-level rate limiting
 - Conversion history
 - Language detection badge
 - Offline fallback rules
@@ -260,10 +259,10 @@ The AI prompt enforces the following rules:
 
 ## 🚧 Current Limitations
 
-- Client-side usage limit (4 conversions/day)
-- No authentication
+- Usage limits are account-based; general IP-level rate limiting is not configured
+- Conversion requests require Google sign-in and Firebase Admin credentials on the server
 - Free-tier Gemini API constraints
-- Max input length limited to 200 characters for free testing
+- Conversion input is limited to 4,000 characters
 
 ---
 
@@ -283,6 +282,16 @@ The AI prompt enforces the following rules:
 - Next.js API Routes
 
 ## 🧪 Testing
+
+### Server credentials
+
+Conversion requests require a Firebase ID token and use the Firebase Admin SDK
+to verify the user and atomically enforce the account's usage limits. Configure
+`FIREBASE_SERVICE_ACCOUNT_JSON` with the service account JSON for the Firebase
+project, or configure Application Default Credentials in the server environment.
+Set `FIREBASE_PROJECT_ID` to the same project as the client Firebase config, or
+ensure `NEXT_PUBLIC_PROJECT_ID` is available to the server. Never expose service
+account credentials to the browser.
 
 This project uses **Jest** and **React Testing Library** for testing React components and frontend logic.
 
