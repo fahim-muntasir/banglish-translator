@@ -1,6 +1,7 @@
 import { Timestamp } from "firebase-admin/firestore";
 import { adminDb } from "@/lib/firebaseAdmin";
 import { PLAN_LIMITS } from "@/lib/plans";
+import { isUserPlan } from "@/lib/plans";
 import { UserPlan } from "@/types/user";
 
 type UsageReservation = {
@@ -11,8 +12,6 @@ type UsageReservation = {
 type ReservationResult =
   | { allowed: true; reservation: UsageReservation }
   | { allowed: false; reason: "ACCOUNT_UNAVAILABLE" | "DAILY_LIMIT" | "MONTHLY_LIMIT" };
-
-const validPlans: UserPlan[] = ["FREE", "STARTER", "PRO", "BUSINESS"];
 
 function toTimestamp(value: unknown): Timestamp | undefined {
   if (value instanceof Timestamp) return value;
@@ -57,7 +56,7 @@ export async function reserveConversion(
       return { allowed: false, reason: "ACCOUNT_UNAVAILABLE" };
     }
 
-    const plan: UserPlan = validPlans.includes(data.plan) ? data.plan : "FREE";
+    const plan: UserPlan = isUserPlan(data.plan) ? data.plan : "FREE";
     const limit = PLAN_LIMITS[plan];
     const storedMonthlyReset = toTimestamp(data.usage?.resetAt);
     const shouldResetMonthly =

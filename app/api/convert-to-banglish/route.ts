@@ -1,18 +1,15 @@
-import { NextRequest, NextResponse } from "next/server";
-import { GoogleGenAI } from "@google/genai";
 import { FirebaseAuthError } from "firebase-admin/auth";
+import { GoogleGenAI } from "@google/genai";
+import { NextRequest, NextResponse } from "next/server";
+import { getConversionSystemInstruction, isTranslationStyle } from "@/lib/conversionPrompts";
+import { getBearerToken } from "@/lib/serverAuth";
 import { adminAuth } from "@/lib/firebaseAdmin";
 import { releaseConversion, reserveConversion } from "@/lib/serverUsage";
 
 export const runtime = "nodejs";
 
-const ai = new GoogleGenAI({
-  apiKey: process.env.GEMINI_API_KEY,
-});
-
 export async function POST(req: NextRequest) {
-  const authorization = req.headers.get("authorization");
-  const token = authorization?.match(/^Bearer (.+)$/i)?.[1];
+  const token = getBearerToken(req);
   if (!token) {
     return NextResponse.json({ error: "Authentication required" }, { status: 401 });
   }
@@ -24,7 +21,6 @@ export async function POST(req: NextRequest) {
     if (error instanceof FirebaseAuthError) {
       console.error("Firebase ID token verification failed", {
         code: error.code,
-        message: error.message,
       });
 
       const projectMismatch =
@@ -48,184 +44,86 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  let reservation:
-    | Awaited<ReturnType<typeof reserveConversion>> & { allowed: true }
-    | undefined;
+  const apiKey = process.env.GEMINI_API_KEY;
+  if (!apiKey) {
+    console.error("Gemini API key is not configured");
+    return NextResponse.json(
+      { error: "Conversion service is not configured" },
+      { status: 503 },
+    );
+  }
+
+  let body: unknown;
   try {
-    const body: unknown = await req.json();
-    if (!body || typeof body !== "object") {
-      return NextResponse.json({ error: "Invalid request body" }, { status: 400 });
-    }
-    const { text, style } = body as { text?: unknown; style?: unknown };
+    body = await req.json();
+  } catch {
+    return NextResponse.json({ error: "Invalid request body" }, { status: 400 });
+  }
+  if (!body || typeof body !== "object" || Array.isArray(body)) {
+    return NextResponse.json({ error: "Invalid request body" }, { status: 400 });
+  }
 
-    if (typeof text !== "string" || !text.trim()) {
-      return NextResponse.json({ error: "No text provided" }, { status: 400 });
-    }
-    if (text.length > 4000) {
-      return NextResponse.json({ error: "Text exceeds the 4000 character limit" }, { status: 413 });
-    }
+  const { text, style } = body as { text?: unknown; style?: unknown };
+  if (typeof text !== "string" || !text.trim()) {
+    return NextResponse.json({ error: "No text provided" }, { status: 400 });
+  }
+  if (text.length > 4000) {
+    return NextResponse.json(
+      { error: "Text exceeds the 4000 character limit" },
+      { status: 413 },
+    );
+  }
+  if (!isTranslationStyle(style)) {
+    return NextResponse.json(
+      { error: "Invalid style selected" },
+      { status: 400 },
+    );
+  }
 
-    const validStyles = [
-      "casual",
-      "funny",
-      "professional",
-      "romantic",
-      "attitude",
-      "facebook",
-      "storytelling",
-    ] as const;
-    
-    const validStyle = validStyles.find((candidate) => candidate === style);
-
-    if (!validStyle) {
-      return NextResponse.json(
-        { error: "Invalid style selected" },
-        { status: 400 },
-      );
-    }
-
-    const result = await reserveConversion(uid);
-    if (!result.allowed) {
-      const status = result.reason === "ACCOUNT_UNAVAILABLE" ? 403 : 429;
-      return NextResponse.json({ error: result.reason }, { status });
-    }
-    reservation = result;
-
-    const BASE_RULES = `
-    You are a Banglish conversion engine.
-
-    Convert the following text into Banglish (Romanized Bangla):
-
-    "${text}"
-
-    GLOBAL RULES (STRICT):
-    - Convert ALL languages into Banglish (Romanized Bangla).
-    - If input is Bangla → transliterate strictly word-by-word.
-    - If input is already Banglish:
-      - DO NOT rewrite or paraphrase.
-      - ONLY fix spelling or typing mistakes.
-      - DO NOT change tone or sentence structure.
-    - If input is English or any other language:
-      - Convert fully into natural Banglish.
-      - Do NOT keep full English sentences.
-    - Preserve short casual English words only (hi, hello, ok, okay, wow).
-    - Preserve punctuation and line breaks.
-    - Do NOT add explanations.
-    - Do NOT add titles or headings.
-    - Output ONLY Banglish text.
-    `;
-
-    const CASUAL_PROMPT = `
-    ${BASE_RULES}
-
-    STYLE RULES:
-    - Tone should feel natural, friendly, and conversational.
-    - Use everyday Banglish used in chats.
-    - Keep it simple and relaxed.
-    - Avoid formal or heavy words.
-    - Emojis allowed only if they feel natural.
-    `;
-
-    const FUNNY_PROMPT = `
-    ${BASE_RULES}
-
-    STYLE RULES:
-    - Make the tone light, playful, and funny.
-    - Use common Banglish humor or expressions.
-    - Light sarcasm is allowed.
-    - Emojis like 😂😆🤣 allowed.
-    - Do NOT overdo jokes or make it cringe.
-    - Keep it short and punchy.
-    `;
-
-    const PROFESSIONAL_PROMPT = `
-    ${BASE_RULES}
-
-    STYLE RULES:
-    - Tone must be polite, clean, and professional.
-    - Suitable for office or formal communication.
-    - No slang.
-    - No emojis.
-    - Use respectful and clear Banglish.
-    `;
-
-    const ROMANTIC_PROMPT = `
-    ${BASE_RULES}
-
-    STYLE RULES:
-    - Tone should be soft, emotional, and warm.
-    - Use gentle and expressive Banglish.
-    - Emotion should feel natural, not dramatic.
-    - Emojis like ❤️🥺✨ allowed if they fit naturally.
-    - Avoid exaggeration.
-    `;
-
-    const ATTITUDE_PROMPT = `
-    ${BASE_RULES}
-
-    STYLE RULES:
-    - Tone should be confident, bold, and stylish.
-    - Slight swag or attitude is allowed.
-    - Should sound cool, not rude.
-    - Emojis like 😎🔥💯 allowed.
-    - Keep it sharp and impactful.
-    `;
-
-    const FACEBOOK_PROMPT = `
-    ${BASE_RULES}
-
-    STYLE RULES:
-    - Friendly and expressive.
-    - Feels like a real Facebook status.
-    - Slight emotional or personal touch allowed.
-    - Emojis allowed but not too many.
-    - Should feel relatable and natural.
-    `;
-
-    const STORYTELLING_PROMPT = `
-    ${BASE_RULES}
-
-    STYLE RULES:
-    - Narrative and flowing tone.
-    - Feels like telling a short moment or story.
-    - Natural pacing and emotional flow.
-    - Avoid sounding robotic or formal.
-    - Do NOT shorten too much.
-    `;
-
-    const PROMPTS = {
-      casual: CASUAL_PROMPT,
-      funny: FUNNY_PROMPT,
-      professional: PROFESSIONAL_PROMPT,
-      romantic: ROMANTIC_PROMPT,
-      attitude: ATTITUDE_PROMPT,
-      facebook: FACEBOOK_PROMPT,
-      storytelling: STORYTELLING_PROMPT,
-    } as const;
-
-    const finalPrompt = PROMPTS[validStyle];
-
-    // Use Gemini API to generate Banglish
-    const response = await ai.models.generateContent({
-      model: "gemini-2.5-flash",
-      contents: finalPrompt,
+  let result: Awaited<ReturnType<typeof reserveConversion>>;
+  try {
+    result = await reserveConversion(uid);
+  } catch (error) {
+    console.error("Conversion usage reservation failed", {
+      message: error instanceof Error ? error.message : "Unknown error",
     });
+    return NextResponse.json(
+      { error: "Unable to verify conversion allowance" },
+      { status: 503 },
+    );
+  }
+  if (!result.allowed) {
+    const status = result.reason === "ACCOUNT_UNAVAILABLE" ? 403 : 429;
+    return NextResponse.json({ error: result.reason }, { status });
+  }
 
-    const convertedText = response?.text || "";
+  try {
+    const response = await new GoogleGenAI({ apiKey }).models.generateContent({
+      model: "gemini-2.5-flash",
+      contents: text,
+      config: {
+        systemInstruction: getConversionSystemInstruction(style),
+        httpOptions: { timeout: 30_000 },
+      },
+    });
+    const convertedText = response.text;
+    if (!convertedText?.trim()) {
+      throw new Error("Gemini returned an empty conversion");
+    }
 
     return NextResponse.json({ convertedText });
-  } catch (err) {
-    console.error(err);
-    if (reservation?.allowed) {
-      try {
-        await releaseConversion(uid, reservation.reservation);
-      } catch (releaseError) {
-        console.error("Failed to release conversion usage reservation", releaseError);
-      }
+  } catch (error) {
+    console.error("Conversion request failed", {
+      message: error instanceof Error ? error.message : "Unknown error",
+    });
+    try {
+      await releaseConversion(uid, result.reservation);
+    } catch (releaseError) {
+      console.error("Failed to release conversion usage reservation", releaseError);
     }
     return NextResponse.json(
       { error: "Failed to convert text" },
-      { status: 500 },
+      { status: 502 },
     );
   }
 }

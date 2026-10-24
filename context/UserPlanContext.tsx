@@ -5,8 +5,7 @@ import { doc, getDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { useAuth } from "./AuthContext";
 import { UserPlan } from "@/types/user";
-
-// export type UserPlan = "FREE" | "STARTER" | "PRO" | "BUSINESS";
+import { isUserPlan } from "@/lib/plans";
 
 type UserPlanContextType = {
   plan: UserPlan;
@@ -21,8 +20,11 @@ export const UserPlanProvider = ({ children }: { children: React.ReactNode }) =>
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    let active = true;
+    setPlan("FREE");
+    setLoading(true);
+
     if (!user) {
-      setPlan("FREE");
       setLoading(false);
       return;
     }
@@ -33,19 +35,23 @@ export const UserPlanProvider = ({ children }: { children: React.ReactNode }) =>
         const snap = await getDoc(ref);
 
         if (snap.exists()) {
-          setPlan(snap.data().plan || "FREE");
+          const storedPlan: unknown = snap.data().plan;
+          if (active) setPlan(isUserPlan(storedPlan) ? storedPlan : "FREE");
         } else {
-          setPlan("FREE");
+          if (active) setPlan("FREE");
         }
       } catch (err) {
         console.error("Failed to fetch plan", err);
-        setPlan("FREE");
+        if (active) setPlan("FREE");
       } finally {
-        setLoading(false);
+        if (active) setLoading(false);
       }
     };
 
     fetchPlan();
+    return () => {
+      active = false;
+    };
   }, [user]);
 
   return (

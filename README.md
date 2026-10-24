@@ -80,7 +80,7 @@ Each style follows a **strict rule-based AI prompt system** to ensure high-quali
 - ✅ Keeps tone consistent per selected style
 - ✅ Prevents unwanted English output
 - ✅ Emoji usage controlled per style
-- ✅ No hallucination or unnecessary rewriting
+- ✅ Prompted to avoid hallucinations and unnecessary rewriting
 
 ---
 
@@ -110,7 +110,7 @@ Each style follows a **strict rule-based AI prompt system** to ensure high-quali
   - Accuracy
   - Speed
   - Chat-style output
-  - Zero hallucination
+  - Meaning-preserving output (AI results may still contain errors)
 
 ---
 
@@ -118,7 +118,7 @@ Each style follows a **strict rule-based AI prompt system** to ensure high-quali
 
 #### FREE Users
 - Daily usage limit enforced by the server
-- Auto reset every 24 hours
+- Resets daily based on the server's calendar day
 - Ideal for casual use
 
 #### Paid Users
@@ -146,7 +146,7 @@ Each style follows a **strict rule-based AI prompt system** to ensure high-quali
 
 ### FREE Users
 - 2 conversions per day
-- Resets every 24 hours
+- Resets daily based on the server's calendar day
 - Daily limit enforced
 
 ### Paid Users
@@ -161,13 +161,12 @@ Each style follows a **strict rule-based AI prompt system** to ensure high-quali
 - Secure session handling
 - Firestore user profile
 - Auto user creation
+- Deploy `firestore.rules` with the Firebase CLI before enabling client Firestore access.
 
 ---
 
 ### 💳 Upgrade Flow
 - Upgrade modal
-- Centralized upgrade handler
-- Ready for Stripe / LemonSqueezy
 - Plan-based UI rendering
 
 ---
@@ -180,12 +179,13 @@ This system is built with **security-first backend pricing logic**, ensuring use
 
 ---
 
-### 🔐 Secure Pricing Architecture
+### 🔐 Payment Verification
 
-- Frontend sends **only the selected plan name**
-- All prices are defined **server-side**
-- Payment amount is calculated securely on the backend
-- Prevents price tampering via DevTools or API calls
+- Checkout requires a verified Firebase ID token; the account ID is taken from that token.
+- The server selects the amount from its plan-price table and records a pending transaction.
+- The success callback validates the transaction directly with SSLCommerz and checks its ID, amount, currency, and validation ID before atomically changing the plan.
+- Repeated success callbacks are idempotent. Browser-submitted status and account/plan fields are not trusted.
+- Firestore rules allow users to read their own profile, create a free profile, and update only their login timestamp. Privileged plan and usage changes are server-side.
 
 ```ts
 FREE → ৳0  
@@ -193,6 +193,8 @@ STARTER → ৳499
 PRO → ৳999  
 BUSINESS → ৳2999
 ```
+
+The current payment flow is a one-time checkout. Automatic monthly renewal and plan-expiration enforcement are not implemented.
 ---
 
 ### 🎨 UI / UX Highlights
@@ -219,7 +221,7 @@ BUSINESS → ৳2999
 
 The AI prompt enforces the following rules:
 
-- Convert **ALL languages** into Banglish
+- Convert text from supported languages into Banglish
 - **Bangla text**
   - Strict transliteration (no rewriting)
 - **Already Banglish**
@@ -292,6 +294,11 @@ project, or configure Application Default Credentials in the server environment.
 Set `FIREBASE_PROJECT_ID` to the same project as the client Firebase config, or
 ensure `NEXT_PUBLIC_PROJECT_ID` is available to the server. Never expose service
 account credentials to the browser.
+
+Payment checkout additionally requires `SSLCOMMERZ_STORE_ID`,
+`SSLCOMMERZ_STORE_PASSWORD`, `SSLCOMMERZ_IS_LIVE`, and `NEXT_PUBLIC_APP_URL`.
+Keep all gateway credentials server-side. The Firebase Admin service account
+must belong to the same Firebase project used for sign-in.
 
 This project uses **Jest** and **React Testing Library** for testing React components and frontend logic.
 
