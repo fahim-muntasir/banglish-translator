@@ -1,317 +1,163 @@
-# Fahim-er Banglish Translator ✨
+# Banglish Translator
 
-A modern, fast, and social-media-friendly **Banglish (Romanized Bangla) translator** that transforms **any language** into natural Banglish — optimized for chats, posts, and everyday communication.
+**Translate any language into natural, conversational Banglish.**
 
-Built with **Next.js**, **TypeScript**, **Tailwind CSS**, and **Google Gemini AI**.
+This Translator is an AI-powered tool that transforms text into Romanized Bangla (Banglish), designed for everyday conversations, social media posts, and personal communication.
+
+Built with Next.js, TypeScript, Tailwind CSS, Firebase, and Google Gemini AI.
+
+**Live Demo:** [https://banglish-translator.vercel.app](https://banglish-translator.vercel.app)
 
 ---
 
-## 🚀 Live Demo
-[https://banglish-translator.vercel.app](https://banglish-translator.vercel.app)
+## 📸 Screenshots
+
+### Main Interface
+
+![Banglish Translator — Main Interface](public/images/ss1.png)
+
+### Dark Mode
+
+![Banglish Translator — Dark Mode](public/images/ss2.png)
+
+### Choose Your Plan
+
+![Banglish Translator — Dark Mode](public/images/ss3.png)
 
 ---
 
 ## ✨ Features
 
-- 🌍 **Multi-language input**
-  - Supports Bangla, English, Chinese, Japanese, Arabic, Hindi, Russian, German, and more
-- 📝 **Strict Bangla → Banglish transliteration**
-  - Word-by-word conversion (no paraphrasing)
-- 💬 **Natural conversational Banglish**
-  - Optimized for chats & social media
-- 🔧 **Smart Banglish handling**
-  - Fixes spelling if the input is already Banglish
-- ⚡ **Fast AI-powered conversion**
-  - Powered by Google Gemini (`gemini-2.5-flash`)
-- 🎯 **Usage limits**
-  - Enforced by the server against authenticated Firebase users
-- 🌗 **Light / Dark mode**
-  - System-aware theme toggle
-- ⌨️ **Keyboard support**
-  - `Ctrl + Enter` / `Cmd + Enter` to convert
-- ♿ **Accessible by design**
-  - Screen-reader & keyboard friendly
-- 🎨 **Polished UI**
-  - Smooth animations & typing effect
+- **Multi-language input** — Convert text from Bangla, English, Hindi, Chinese, Japanese, Arabic, Russian, German, and more.
+- **Conversational Banglish** — Generate natural-sounding Banglish for chats and social media.
+- **Multiple writing styles** — Choose a tone that fits your message.
+- **Smart transliteration** — Preserve Bangla wording when converting it into Romanized Bangla.
+- **Banglish correction** — Improve spelling when the input is already written in Banglish.
+- **AI-powered conversion** — Uses Google Gemini (`gemini-2.5-flash`).
+- **Google authentication** — Sign in with Firebase Authentication.
+- **Server-enforced usage limits** — Apply account-based conversion quotas.
+- **Paid plans** — Includes an SSLCommerz checkout flow for plan upgrades.
+- **Light and dark themes** — Supports system-aware theme preferences.
+- **Keyboard shortcuts** — Press `Ctrl + Enter` or `Cmd + Enter` to convert.
+- **Accessibility** — Keyboard navigation, focus states, semantic HTML, and screen-reader support.
 
 ---
 
-## ✨ Core Capabilities
+## 🎭 Writing Styles
 
-### 🌍 Multi-Language Support
-- Supports:
-  - Bangla
-  - English
-  - Hindi
-  - Chinese
-  - Japanese
-  - Arabic
-  - Russian
-  - German
-- Converts everything into **Banglish**
+Choose a style to match your intended tone and context.
 
-## 🎭 Style-Based Banglish Conversion
+| Style | Best for |
+|---|---|
+| Casual | Everyday conversations |
+| Funny | Playful, humorous messages |
+| Professional | Polite, work-friendly communication |
+| Romantic | Emotional and affectionate messages |
+| Attitude | Bold and confident expressions |
+| Facebook Post | Social media content |
+| Storytelling | Narrative-style writing |
 
-The translator supports **multiple writing styles**, allowing users to generate Banglish that perfectly matches their tone and context.
+The conversion prompt combines general conversion rules with style-specific instructions to help preserve meaning, structure, and tone. AI output may still contain errors.
 
 ---
 
-## ✅ Available Styles
+## 🧠 How It Works
 
-| Style | Description |
-|------|-------------|
-| **Casual** | Natural, everyday Banglish for chatting |
-| **Funny** | Light humor, playful tone, fun expressions |
-| **Professional** | Clean, polite, office-friendly Banglish |
-| **Romantic** | Soft, emotional, expressive tone |
-| **Attitude** | Confident, bold, stylish Banglish |
-| **Facebook Post** | Social-friendly, expressive writing |
-| **Storytelling** | Narrative flow with emotional depth |
+1. Sign in with your Google account.
+2. Select a writing style.
+3. Enter text in your preferred language.
+4. Submit the text for AI-powered conversion.
+5. Copy and use the generated Banglish.
+
+The server verifies the user's identity, checks the applicable usage limits, processes the request through Gemini, and returns the result.
 
 ---
 
-## 🧠 Smart Style Engine
+## 🔤 Conversion Rules
 
-Each style follows a **strict rule-based AI prompt system** to ensure high-quality and consistent output:
+The conversion logic is designed around the type of input:
 
-- ✅ Converts **any language → Banglish**
-- ✅ Preserves meaning and sentence structure
-- ✅ Fixes spelling if input is already Banglish
-- ✅ Keeps tone consistent per selected style
-- ✅ Prevents unwanted English output
-- ✅ Emoji usage controlled per style
-- ✅ Prompted to avoid hallucinations and unnecessary rewriting
+- **Bangla:** Prioritizes transliteration over paraphrasing.
+- **Already Banglish:** Focuses on correcting spelling without unnecessarily changing sentence structure.
+- **English and other languages:** Generates natural, spoken Banglish while aiming to preserve the original meaning.
+- **Output:** Avoids explanations and unnecessary rewriting.
 
----
-
-## 🎯 How It Works
-
-1. User selects a **style** (Casual, Funny, Professional, etc.)
-2. User enters text in **any language**
-3. AI applies:
-   - Global Banglish conversion rules  
-   - Style-specific tone logic  
-4. Output is returned as **natural Banglish**
+These are prompt-driven behaviors, not guarantees of perfect translation or transliteration.
 
 ---
 
-### 🔤 Smart Banglish Conversion
-- ✅ Word-by-word Bangla transliteration  
-- ✅ Fixes spelling if input is already Banglish  
-- ✅ Converts foreign languages naturally  
-- ✅ Keeps sentence structure  
-- ✅ Preserves punctuation & tone  
+## 🎯 Usage & Credits
+
+| Plan | Usage model |
+|---|---|
+| Free | 2 conversions per day |
+| Starter | Monthly conversion quota |
+| Pro | Monthly conversion quota |
+| Business | Monthly conversion quota |
+
+- Free usage resets according to the server's calendar day.
+- Paid usage follows a monthly quota.
+- Usage updates are reflected in the interface through Firestore listeners.
+- The server is authoritative for usage enforcement.
+
+**Payment note:** Paid-plan checkout currently uses SSLCommerz as a one-time payment flow. Automatic recurring billing and plan-expiration enforcement are not implemented.
 
 ---
 
-### ⚡ AI-Powered
-- Powered by **Google Gemini (gemini-2.5-flash)**
-- Optimized prompt engineering for:
-  - Accuracy
-  - Speed
-  - Chat-style output
-  - Meaning-preserving output (AI results may still contain errors)
+## 🔐 Authentication & Payment Security
+
+- Google sign-in through Firebase Authentication.
+- Server-side Firebase ID-token verification.
+- Server-controlled plan pricing.
+- SSLCommerz transaction validation before activating a paid plan.
+- Checks for transaction ID, validation ID, amount, and currency.
+- Idempotent handling of repeated successful payment callbacks.
+- Server-side enforcement of privileged plan and usage changes.
+- Firestore security rules for user profile access.
+
+Deploy and verify `firestore.rules` against your Firebase project before enabling client-side Firestore access.
 
 ---
 
-### 🧠 Smart Usage & Credit System
-
-#### FREE Users
-- Daily usage limit enforced by the server
-- Resets daily based on the server's calendar day
-- Ideal for casual use
-
-#### Paid Users
-- Monthly credit limit
-- No daily restriction
-- Higher conversion quota
-
-#### 🔄 Realtime Updates
-- Live usage tracking
-- Firestore `onSnapshot` listener
-- UI updates instantly
-
----
-
-### 📊 Credit Tracking
-- Daily usage (Free plan)
-- Monthly usage (Paid plans)
-- Auto reset system
-- Live credit display
-- Upgrade CTA when limit reached
-
----
-
-## 🔁 Credit Logic
-
-### FREE Users
-- 2 conversions per day
-- Resets daily based on the server's calendar day
-- Daily limit enforced
-
-### Paid Users
-- Monthly quota
-- No daily limit
-- Resets monthly
-
----
-
-### 🔐 Authentication
-- Google Sign-In (Firebase Auth)
-- Secure session handling
-- Firestore user profile
-- Auto user creation
-- Deploy `firestore.rules` with the Firebase CLI before enabling client Firestore access.
-
----
-
-### 💳 Upgrade Flow
-- Upgrade modal
-- Plan-based UI rendering
-
----
-
-## 💳 Payment Gateway & Subscription System (Bangladesh 🇧🇩)
-
-The project includes a **Bangladesh-ready subscription payment system** designed for SaaS-style upgrades, using **SSLCommerz** as the primary payment gateway.
-
-This system is built with **security-first backend pricing logic**, ensuring users cannot manipulate plan prices from the client side.
-
----
-
-### 🔐 Payment Verification
-
-- Checkout requires a verified Firebase ID token; the account ID is taken from that token.
-- The server selects the amount from its plan-price table and records a pending transaction.
-- The success callback validates the transaction directly with SSLCommerz and checks its ID, amount, currency, and validation ID before atomically changing the plan.
-- Repeated success callbacks are idempotent. Browser-submitted status and account/plan fields are not trusted.
-- Firestore rules allow users to read their own profile, create a free profile, and update only their login timestamp. Privileged plan and usage changes are server-side.
-
-```ts
-FREE → ৳0  
-STARTER → ৳499  
-PRO → ৳999  
-BUSINESS → ৳2999
-```
-
-The current payment flow is a one-time checkout. Automatic monthly renewal and plan-expiration enforcement are not implemented.
----
-
-### 🎨 UI / UX Highlights
-- Modern glassmorphism UI
-- Responsive design
-- Smooth typing animation
-- Dark / Light mode
-- Keyboard shortcuts  
-  - `Ctrl + Enter`
-  - `Cmd + Enter`
-- Accessible (ARIA + keyboard support)
-
----
-
-### 🧠 Intelligent Logic
-- Monthly limit checked first
-- Daily limit only for FREE users
-- Auto reset logic
-- Safe fallback handling
-
----
-
-## 🧠 Conversion Rules
-
-The AI prompt enforces the following rules:
-
-- Convert text from supported languages into Banglish
-- **Bangla text**
-  - Strict transliteration (no rewriting)
-- **Already Banglish**
-  - Fix spelling mistakes only
-  - Do NOT change sentence structure
-- **English & other languages**
-  - Convert to natural spoken Banglish
-- Preserve:
-  - Punctuation
-  - Casual English words (`hi`, `hello`, `ok`, `wow`)
-- Output:
-  - Banglish only
-  - No explanations
-
----
-
-## ♿ Accessibility Highlights
-
-- Screen-reader-only labels
-- Keyboard navigation (Tab order)
-- Focus-visible states
-- ARIA attributes for buttons and text areas
-- Semantic HTML structure
-- Form submission via Ctrl+Enter / Cmd+Enter
-
----
-
-## 🧩 Future Improvements
-
-- IP-level rate limiting
-- Conversion history
-- Language detection badge
-- Offline fallback rules
-- PWA support
-
----
-
-## 🚧 Current Limitations
-
-- Usage limits are account-based; general IP-level rate limiting is not configured
-- Conversion requests require Google sign-in and Firebase Admin credentials on the server
-- Free-tier Gemini API constraints
-- Conversion input is limited to 4,000 characters
-
----
-
-## 🛠 Tech Stack
+## 🛠️ Tech Stack
 
 ### Frontend
+
 - Next.js
 - TypeScript
 - Tailwind CSS
 - Lucide Icons
-- Sonner (toast notifications)
+- Sonner
 
-### Backend
-- Firebase Auth
-- Firestore
+### Backend & Services
+
+- Next.js Route Handlers
+- Firebase Authentication
+- Cloud Firestore
+- Firebase Admin SDK
 - Google Gemini AI
-- Next.js API Routes
+- SSLCommerz
 
-## 🧪 Testing
+### Testing
 
-### Server credentials
+- Jest
+- React Testing Library
 
-Conversion requests require a Firebase ID token and use the Firebase Admin SDK
-to verify the user and atomically enforce the account's usage limits. Configure
-`FIREBASE_SERVICE_ACCOUNT_JSON` with the service account JSON for the Firebase
-project, or configure Application Default Credentials in the server environment.
-Set `FIREBASE_PROJECT_ID` to the same project as the client Firebase config, or
-ensure `NEXT_PUBLIC_PROJECT_ID` is available to the server. Never expose service
-account credentials to the browser.
+---
 
-Payment checkout additionally requires `SSLCOMMERZ_STORE_ID`,
-`SSLCOMMERZ_STORE_PASSWORD`, `SSLCOMMERZ_IS_LIVE`, and `NEXT_PUBLIC_APP_URL`.
-Keep all gateway credentials server-side. The Firebase Admin service account
-must belong to the same Firebase project used for sign-in.
+## 🚀 Getting Started
 
-This project uses **Jest** and **React Testing Library** for testing React components and frontend logic.
+### Prerequisites
 
-### How to Run Tests
+- Node.js and npm
+- A Firebase project with Authentication and Firestore configured
+- A Google Gemini API key
+- SSLCommerz credentials if testing the payment flow
+
+### Installation
 
 ```bash
-# Run all tests once
-npm test
-
-# Run tests in watch mode (recommended during development)
-npm run test:watch
-
+git clone https://github.com/fahim-muntasir/Banglish-Translator.git
+cd Banglish-Translator
+npm install
 ```
-
-## ⭐ Support
-If you like this project, please give it a ⭐ on GitHub!

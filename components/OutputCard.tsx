@@ -47,12 +47,6 @@ const OutputCard = ({ output, isTyping, onClear }: OutputCardProps) => {
         <div className="p-4 md:p-6 min-h-[120px] md:min-h-[150px] text-base md:text-xl leading-relaxed font-semibold whitespace-pre-wrap">
           <p className={isTyping ? "typing-cursor" : ""}>{output}</p>
         </div>
-
-        {output && !isTyping && (
-          <div className="absolute -bottom-5 right-4 nb-sticker bg-secondary px-3 py-1 text-sm animate-nb-pop">
-            🎉 LEVEL CLEAR!
-          </div>
-        )}
       </div>
 
       <div aria-live="polite" className="sr-only">
